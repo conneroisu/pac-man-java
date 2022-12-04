@@ -1,0 +1,162 @@
+package hw4;
+
+import java.util.Random;
+import api.MazeMap;
+import api.Mode;
+import api.Location;
+import api.Descriptor;
+
+import api.Descriptor;
+import api.Direction;
+import api.MazeCell;
+import static api.Direction.RIGHT;
+import static api.Direction.UP;
+import static api.Direction.LEFT;
+import static api.Direction.DOWN;
+
+import static api.Mode.*;
+
+import api.Actor;
+
+public class Blinky implements Actor{
+	// SPEED
+	// The base Increment for the speed of the ghost
+	double baseIncrement;
+	// The current speed of the ghost
+	double currentSpeed;
+
+	//TO DO WITH THE MAP
+	// A read-only representation of the maze for detecting walls and edges
+	MazeMap maze;
+	Location scatterTarget; // The scatter location for scatter mode
+
+
+	// The current direction of the ghost
+	private Direction currentDirection;
+	
+	// The current location of the ghost
+	private Location currLocation;
+
+	// The current mode of the ghost
+	private Mode currentMode;
+	
+	// The exact row and column of the ghost
+	private double rowExact;
+	private double colExact;
+
+	//Constructor for Blinky Class
+	public Blinky(MazeMap maze, Location home, double baseSpeed, Direction homeDirection, Location scatterTarget, Random rand) {
+		this.baseIncrement = baseSpeed;
+		this.maze = maze;
+		this.currentDirection = homeDirection;
+		this.currLocation = home;
+		this.colExact = home.col();
+		this.rowExact = home.row();	
+		this.scatterTarget = scatterTarget;
+	}
+
+	@Override
+	public void setDirection(Direction dir) {
+		this.currentDirection = dir;
+	}
+
+	@Override
+	public double getCurrentIncrement() {
+		return this.baseIncrement;
+	}
+
+	@Override
+	public Direction getCurrentDirection() {
+		return this.currentDirection;
+	}
+
+	@Override
+	public Location getCurrentLocation() {
+		return this.currLocation;
+	}
+
+	public void calculateNextCell(Descriptor d)
+	{
+		Location currentLoc = new Location((int) getRowExact(), (int) getColExact()) ;
+		
+
+
+	if (currentLoc.row() > 2)
+	  {
+		nextLoc = getNextCell();
+		nextDir = Direction.UP;
+	  }
+	  else
+	  {
+		Location nextLoc = new Location(currentLoc.row(), currentLoc.col() + 1);
+		
+	  }
+	}
+
+
+	
+	public Location getNextCell() {
+		return null;
+	}
+
+	@Override
+	public double getColExact() {
+		return this.colExact;
+
+	} 
+	@Override
+	public double getRowExact() {
+		return this.rowExact;
+	}
+
+	public void setMode(Mode gMode, Descriptor Description) {
+		//		return new Descriptor(playerLoc, playerDir, enemyLoc)
+		this.currentMode = gMode;
+		calculateNextCell(Description);
+		// TODO
+	}
+
+	public void update(Descriptor description) {
+		// Given a descriptor, update the state of this actor
+
+	}
+
+	@Override
+	public void reset(){
+		setMode(Mode.INACTIVE, null);
+		currentSpeed = this.baseIncrement;
+		setDirection(getHomeDirection());
+		
+	}
+
+	@Override
+	public double getBaseIncrement() {
+		return this.baseIncrement;
+	}
+
+	@Override
+	public Direction getHomeDirection() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Location getHomeLocation() {
+		return t
+	}
+
+	@Override
+	public Mode getMode() {
+		return this.currentMode;
+	}
+
+	@Override
+	public void setColExact(double c) {
+		this.colExact = c;
+	}
+
+	@Override
+	public void setRowExact(double r) {
+		this.rowExact = r;
+	}
+}

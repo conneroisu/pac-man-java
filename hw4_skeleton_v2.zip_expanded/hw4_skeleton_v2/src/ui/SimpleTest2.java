@@ -1,3 +1,5 @@
+package ui;
+
 import api.PacmanGame;
 import hw4.Blinky;
 import static api.Mode.*;

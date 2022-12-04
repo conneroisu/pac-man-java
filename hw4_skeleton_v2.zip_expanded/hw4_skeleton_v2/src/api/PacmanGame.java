@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import hw4.Pacman;
-
+import hw4.Blinky;
 
 /**
  * State and logic for a Pacman game.
@@ -192,15 +192,15 @@ public class PacmanGame
             
 // TODO: UNCOMMENT THESE LINES AS YOU GET THE GHOSTS IMPLEMENTED...
             
-//            if (c == 'B')
-//            {
-//              Location home = new Location(row, col);
-//              Direction dir = findInitialDirection(row, col);
-//              Location scatterTarget = new Location(-3, width - 3);
-//              Actor a = new Blinky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
-//              enemyList.add(0, a);
-//              colorList.add(0, Color.RED);
-//            }
+            if (c == 'B')
+            {
+              Location home = new Location(row, col);
+              Direction dir = findInitialDirection(row, col);
+              Location scatterTarget = new Location(-3, width - 3);
+              Actor a = new Blinky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
+              enemyList.add(0, a);
+              colorList.add(0, Color.RED);
+            }
 //            else if (c == 'P')
 //            {
 //              Location home = new Location(row, col);
