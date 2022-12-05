@@ -122,7 +122,7 @@ public abstract class SuperClass implements Actor{
 
 	public void update(Descriptor description) {
 		// Given a descriptor, update the state of this actor
-		if(getMode() != Mode.INACTIVE) {
+		if(getMode() != INACTIVE) {
 		}else { 
 			
 		}
@@ -134,7 +134,7 @@ public abstract class SuperClass implements Actor{
 		setMode(Mode.INACTIVE, null);
 		currentSpeed = this.baseIncrement;
 		setDirection(getHomeDirection());
-		this.currentLocation = this.home;
+		this.currLocation = this.home;
 		
 	}
 
@@ -180,7 +180,7 @@ public abstract class SuperClass implements Actor{
 	 * LOCATION LOCATION LOCATION LOCATION
 	 */
 	public Location getCurrentLocation() {
-		return this.currentLocation;
+		return this.currLocation;
 	}
 	public Location getHomeLocation() {
 		return this.home;

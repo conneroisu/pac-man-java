@@ -52,11 +52,24 @@ public class Blinky implements Actor{
 		this.scatterTarget = scatterTarget;
 	}
 
-
+	@Override
+	public void setDirection(Direction dir) {
+		this.currentDirection = dir;
+	}
 
 	@Override
 	public double getCurrentIncrement() {
 		return this.baseIncrement;
+	}
+
+	@Override
+	public Direction getCurrentDirection() {
+		return this.currentDirection;
+	}
+
+	@Override
+	public Location getCurrentLocation() {
+		return this.currLocation;
 	}
 
 
@@ -76,6 +89,48 @@ public class Blinky implements Actor{
 	  }
 	}
 
+
+	
+	@Override
+	public double getColExact() {
+		return this.colExact;
+	} 
+	@Override
+	public double getRowExact() {
+		return this.rowExact;
+	}
+
+	public void setMode(Mode gMode, Descriptor Description) {
+		//		return new Descriptor(playerLoc, playerDir, enemyLoc)
+		this.currentMode = gMode;
+		if(Description != null) {
+			calculateNextCell(Description);
+		}
+
+		// Adjust the ghost speed according to the mode
+		if (gMode == Mode.FRIGHTENED) {
+			this.currentSpeed = this.baseIncrement / 2;
+		} else {
+			this.currentSpeed = this.baseIncrement;
+		}
+	}
+
+	public void update(Descriptor description) {
+		// Given a descriptor, update the state of this actor
+
+	}
+
+	@Override
+	public void reset(){
+		setMode(Mode.INACTIVE, null);
+		currentSpeed = this.baseIncrement;
+		setDirection(getHomeDirection());
+	}
+
+	@Override
+	public double getBaseIncrement() {
+		return this.baseIncrement;
+	}
 
 	@Override
 	public Direction getHomeDirection() {
@@ -97,100 +152,28 @@ public class Blinky implements Actor{
 	}
 
 
-	public void update(Descriptor description) {
-		// Given a descriptor, update the state of this actor
-		if(getMode() != INACTIVE) {
-			currLocation
-		}else { 
-			
-		}
-
-
-	}
-
-	@Override
-	public void reset(){
-		setMode(Mode.INACTIVE, null);
-		currentSpeed = this.baseIncrement;
-		setDirection(getHomeDirection());
-	}
-
-	@Override
-	public double getBaseIncrement() {
-		return this.baseIncrement;
-	}
-
-
-	/**
-	 * MODE MODE MODE MODE MODE
-	 */
-	@Override
-	public void setMode(Mode gMode, Descriptor Description) {
-		//		return new Descriptor(playerLoc, playerDir, enemyLoc)
-		this.currentMode = gMode;
-		if(Description != null) {
-			calculateNextCell(Description);
-		}
-
-		// Adjust the ghost speed according to the mode
-		if (gMode == Mode.FRIGHTENED) {
-			this.currentSpeed = this.baseIncrement * (2.0/3.0);
-		}else if(gMode == Mode.DEAD) {
-			this.currentSpeed = this.baseIncrement * (2.0);
-		}else {
-			this.currentSpeed = this.baseIncrement;
-		}
-	}
-	@Override
-	public Mode getMode() {
-		return this.currentMode;
-	}
-
-	/**
-	 * DIRECTION DIRECTION DIRECTION DIRECTION
-	 */
-	@Override
-	public void setDirection(Direction dir) {
-		this.currentDirection = dir;
-	}
-	@Override
-	public Direction getCurrentDirection() {
-		return this.currentDirection;
-	}
-
-	/**
-	 * LOCATION LOCATION LOCATION LOCATION
-	 */
-	@Override
-	public Location getCurrentLocation() {
-		return this.currLocation;
-	}
 	@Override
 	public Location getHomeLocation() {
 		return this.home;
 	}
 
+	@Override
+	public Mode getMode() {
+		return this.currentMode;
+	}
 
-	/**
-	 * EXACT EXACT EXACT EXACT 
-	 */
 	@Override
 	public void setColExact(double c) {
 		this.colExact = c;
 	}
+
 	@Override
 	public void setRowExact(double r) {
 		this.rowExact = r;
 	}
-	@Override
-	public double getColExact() {
-		return this.colExact;
-	} 
-	@Override
-	public double getRowExact() {
-		return this.rowExact;
-	}
-
+	/*
+	 * Ghost Specific Methods
+	 */
 
 	public Location getNextCell() {
 		this.calculateNextCell(this.currDesc);

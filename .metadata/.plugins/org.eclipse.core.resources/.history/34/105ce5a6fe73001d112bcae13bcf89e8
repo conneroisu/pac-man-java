@@ -12,6 +12,10 @@ import api.Location;
 import api.MazeMap;
 import api.Mode;
 
+/**
+ * Player class for a Pacman game.
+ * @author smkautz
+ */
 public class Pacman implements Actor
 {
   /**

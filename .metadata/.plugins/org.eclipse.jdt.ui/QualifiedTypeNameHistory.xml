@@ -9,4 +9,5 @@
     <fullyQualifiedTypeName name="api.Descriptor"/>
     <fullyQualifiedTypeName name="api.MazeCell"/>
     <fullyQualifiedTypeName name="hw4.Blinky"/>
+    <fullyQualifiedTypeName name="api.Actor"/>
 </qualifiedTypeNameHistroy>
