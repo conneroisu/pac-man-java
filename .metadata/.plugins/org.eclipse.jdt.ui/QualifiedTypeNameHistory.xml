@@ -4,10 +4,10 @@
     <fullyQualifiedTypeName name="api.Location"/>
     <fullyQualifiedTypeName name="java.util.random.RandomGenerator"/>
     <fullyQualifiedTypeName name="java.util.Random"/>
-    <fullyQualifiedTypeName name="api.Mode"/>
-    <fullyQualifiedTypeName name="api.Direction"/>
-    <fullyQualifiedTypeName name="api.Descriptor"/>
     <fullyQualifiedTypeName name="api.MazeCell"/>
     <fullyQualifiedTypeName name="hw4.Blinky"/>
     <fullyQualifiedTypeName name="api.Actor"/>
+    <fullyQualifiedTypeName name="api.Mode"/>
+    <fullyQualifiedTypeName name="api.Descriptor"/>
+    <fullyQualifiedTypeName name="api.Direction"/>
 </qualifiedTypeNameHistroy>

@@ -1,0 +1,192 @@
+package hw4;
+
+import java.util.Random;
+import api.MazeMap;
+import api.Mode;
+import api.Location;
+import api.Descriptor;
+
+import api.Descriptor;
+import api.Direction;
+import api.MazeCell;
+import static api.Direction.RIGHT;
+import static api.Direction.UP;
+import static api.Direction.LEFT;
+import static api.Direction.DOWN;
+
+import static api.Mode.*;
+
+import api.Actor;
+
+public class Blinky implements Actor{
+	// SPEED
+	double baseIncrement;
+	double currentSpeed; 
+
+	//TO DO WITH THE MAP
+	private MazeMap maze; // A read-only representation of the maze for detecting walls and edges
+	private Location scatterTarget; // The scatter location for scatter mode
+	private Location home;
+	private Location currentLocation; // The current location of the ghost
+	private Location nextLocation;
+	private Descriptor currDesc;
+
+	//DIRECTIONS
+	private Direction currentDirection; // Current Direction of the ghost
+	private Direction nextDirection; // The Next Direction of the ghost
+	private double rowExact;
+	private double colExact;
+	
+	// The current mode of the ghost
+	private Mode currentMode;
+	
+
+	//Constructor for Blinky Class
+	public Blinky(MazeMap maze, Location home, double baseSpeed, Direction homeDirection, Location scatterTarget, Random rand) {
+		this.baseIncrement = baseSpeed;
+		this.maze = maze;
+		this.currentDirection = homeDirection;
+		this.home = home;
+		this.colExact = home.col();
+		this.rowExact = home.row();	
+		this.scatterTarget = scatterTarget;
+	}
+
+
+
+	@Override
+	public double getCurrentIncrement() {
+		return this.baseIncrement;
+	}
+
+
+	public void calculateNextCell(Descriptor d)
+	{
+		Location currentLoc = new Location((int) getRowExact(), (int) getColExact()) ;
+		
+
+
+	if (currentLoc.row() > 2)
+	  {
+		nextLocation = new Location(currentLoc.row(), currentLoc.col() + 1);
+	  }
+	  else
+	  {
+		nextLocation = new Location(currentLoc.row(), currentLoc.col() + 1);
+	  }
+	}
+
+
+	@Override
+	public Direction getHomeDirection() {
+		// Gets the direction of the ghost's home location from the current location
+		Location currentLoc = new Location((int) getRowExact(), (int) getColExact()) ;
+		Location homeLoc = getHomeLocation();
+		if (currentLoc.row() > homeLoc.row()) {
+			return UP;
+		}
+		else if (currentLoc.row() < homeLoc.row()) {
+			return DOWN;
+		}
+		else if (currentLoc.col() > homeLoc.col()) {
+			return LEFT;
+		}
+		else {
+			return RIGHT;
+		}	
+	}
+
+
+	public void update(Descriptor description) {
+		// Given a descriptor, update the state of this actor
+		if(getMode() != INACTIVE) {
+		}else { 
+			
+		}
+
+
+	}
+
+	@Override
+	public void reset(){
+		setMode(Mode.INACTIVE, null);
+		currentSpeed = this.baseIncrement;
+		setDirection(getHomeDirection());
+		currentLocation = home;
+	}
+
+	@Override
+	public double getBaseIncrement() {
+		return this.baseIncrement;
+	}
+
+
+	/**
+	 * MODE MODE MODE MODE MODE
+	 */
+	@Override
+	public void setMode(Mode gMode, Descriptor Description) {
+		//		return new Descriptor(playerLoc, playerDir, enemyLoc)
+		this.currentMode = gMode;
+		if(Description != null) {
+			calculateNextCell(Description);
+		}
+
+		// Adjust the ghost speed according to the mode
+		if (gMode == Mode.FRIGHTENED) {
+			this.currentSpeed = this.baseIncrement * (2.0/3.0);
+		}else if(gMode == Mode.DEAD) {
+			this.currentSpeed = this.baseIncrement * (2.0);
+		}else {
+			this.currentSpeed = this.baseIncrement;
+		}
+	}
+	@Override
+	public Mode getMode() {
+		return this.currentMode;
+	}
+
+	/**
+	 * DIRECTION DIRECTION DIRECTION DIRECTION
+	 */
+	@Override
+	public void setDirection(Direction dir) {
+		this.currentDirection = dir;
+	}
+	@Override
+	public Direction getCurrentDirection() {
+		return this.currentDirection;
+	}
+
+	@Override
+	public Location getHomeLocation() {
+		return this.home;
+	}
+
+
+	/**
+	 * EXACT EXACT EXACT EXACT 
+	 */
+	@Override
+	public void setColExact(double c) {
+		this.colExact = c;
+	}
+	@Override
+	public void setRowExact(double r) {
+		this.rowExact = r;
+	}
+	@Override
+	public double getColExact() {
+		return this.colExact;
+	} 
+	@Override
+	public double getRowExact() {
+		return this.rowExact;
+	}
+
+
+	public Location getNextCell() {
+		this.calculateNextCell(this.currDesc);
+		return nextLocation;
+	}
+}

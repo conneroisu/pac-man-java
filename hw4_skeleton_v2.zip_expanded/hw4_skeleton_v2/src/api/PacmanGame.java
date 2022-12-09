@@ -18,8 +18,12 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
-import hw4.Pacman;
 import hw4.Blinky;
+//import hw4.Clyde;
+//import hw4.Inky;
+import hw4.Pacman;
+//import hw4.Pinky;
+
 
 /**
  * State and logic for a Pacman game.
@@ -175,7 +179,18 @@ public class PacmanGame
         else
         {
           current = new MazeCell(EMPTY);
-
+        }
+        cells[row][col] = current;
+      }
+    }
+          
+    for (int row = 0; row < height; ++row)
+    {
+      String s = rows[row];
+      for (int col = 0; col < width; ++col)
+      {
+        char c = s.charAt(col);
+      
           // check for player initial position
           if (c == 'S')
           {
@@ -188,7 +203,6 @@ public class PacmanGame
           else
           {
             // check for ghost initial positions
-
             
 // TODO: UNCOMMENT THESE LINES AS YOU GET THE GHOSTS IMPLEMENTED...
             
@@ -229,9 +243,7 @@ public class PacmanGame
 //              colorList.add(Color.ORANGE);
 //            }
           }
-        }
-        cells[row][col] = current;
-      }
+       }
     }
     enemies = enemyList.toArray(new Actor[] {}); 
     colorHints = colorList.toArray(new Color[] {});
@@ -439,7 +451,6 @@ public class PacmanGame
         inactiveTimer[i] -= 1;
         if (inactiveTimer[i] <= 0)
         {
-          System.out.println("* setting mode " + i + " " +  GLOBAL_MODES[globalModeIndex]);
           enemies[i].setMode(GLOBAL_MODES[globalModeIndex], desc);
         }
       }

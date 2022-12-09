@@ -1,0 +1,17 @@
+package hw4;
+
+import api.Direction;
+import api.Location;
+import api.MazeMap;
+
+/**
+ * 
+ * @author Conner Ohnesorge
+ *
+ */
+public class Pacmang extends SuperClass{
+
+	Pacmang(MazeMap maze, Location home, double baseSpeed, Direction homeDirection) {
+		super(maze, home, baseSpeed, homeDirection);
+	}
+}

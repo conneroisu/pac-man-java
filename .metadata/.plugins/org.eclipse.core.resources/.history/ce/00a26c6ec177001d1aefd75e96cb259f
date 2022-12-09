@@ -1,0 +1,469 @@
+package hw4;
+
+import java.util.Random;
+import api.MazeMap;
+import api.Mode;
+import api.Location;
+import api.Actor;
+import api.Descriptor;
+
+import api.Descriptor;
+import api.Direction;
+import api.MazeCell;
+import static api.Direction.RIGHT;
+import static api.Direction.UP;
+import static api.Direction.LEFT;
+import static api.Direction.DOWN;
+
+public abstract class SuperClass implements Actor{
+	private static final double ERR = 0.001; //Margin of error for comparing exact coordinates to the center of a cell
+	// SPEED
+	private double baseIncrement;
+
+
+	private MazeMap maze; // A read-only representation of the maze for detecting walls and edges
+	private Location scatterTarget; // The scatter location for scatter mode
+	private Location home;
+	private double colExact;
+	private double rowExact;
+	private double turnTarget;
+
+	//CURRENT
+	private Location currentLocation; // The current location 
+	private Descriptor currentDesc;
+	private double currentIncrement;
+	private boolean reverseDirection;
+
+	//NEXT
+	private Direction nextDirection; // The Next Direction
+	private Location nextLocation; // The Next Location
+
+	private Direction currentDirection; // Current Direction
+	private Direction homeDirection;
+	private Direction previousDirection;
+	
+	private Mode currentMode; // The Current Mode
+	private boolean turning;
+	
+	/**
+	 * Constructor for SuperClass for Player Initialization Parameters
+	 * @param maze
+	 * @param home
+	 * @param baseSpeed
+	 * @param homeDirection
+	 */
+	SuperClass(MazeMap maze, Location home, double baseSpeed, Direction homeDirection) {
+		this.maze = maze;
+		this.home = home;
+		this.baseIncrement = baseSpeed;
+		this.currentIncrement = baseSpeed;
+		this.homeDirection = homeDirection;
+	}
+	/**
+	 * Constructor for SuperClass for Ghost Initialization Parameters
+	 * @param maze
+	 * @param home
+	 * @param baseSpeed
+	 * @param homeDirection
+	 * @param scatterTarget
+	 * @param rand
+	 */
+	SuperClass(MazeMap maze, Location home, double baseSpeed, Direction homeDirection, Location scatterTarget, Random rand) {
+		this.baseIncrement = baseSpeed;
+		this.maze = maze;
+		this.currentDirection = homeDirection;
+		this.home = home;
+		this.rowExact = home.row() + 0.5;
+		this.colExact = home.col() + 0.5;
+		this.scatterTarget = scatterTarget;
+		this.currentIncrement = baseSpeed;
+		this.homeDirection = homeDirection;
+	}
+
+	public void reset() {
+		setMode(Mode.INACTIVE, null);
+		currentIncrement = baseIncrement;
+		setDirection(homeDirection);
+		currentLocation = home;
+	}
+
+	public double getCurrentIncrement() {
+		return baseIncrement;
+	}
+
+	abstract Location getTargetLocation(Descriptor desc);
+
+	public void calculateNextCell(Descriptor d){
+		// Get the target location
+		Location targetLocation = getTargetLocation(d);
+		// Get the nextTravelLocation
+		Location nextTravelLocation = getTravelNextLocation(getCurrentDirection());
+
+
+		// calulate the distance between the the adjacent Locations to the nextTravelLocation and the target Location to the target location if they are not walls
+		// creating variables for the wall check 
+		boolean leftWall = maze.isWall(nextTravelLocation.row(), nextTravelLocation.col() - 1);
+		boolean rightWall = maze.isWall(nextTravelLocation.row(), nextTravelLocation.col() + 1);
+		boolean upWall = maze.isWall(nextTravelLocation.row() - 1, nextTravelLocation.col());
+		boolean downWall = maze.isWall(nextTravelLocation.row() + 1, nextTravelLocation.col());
+		// if leftWall is false, create a new location to the left of the nextTravelLocation
+		Location leftLocation = null;
+		Location rightLocation = null;
+		Location upLocation = null;
+		Location downLocation = null;
+
+		if (!leftWall) {
+			leftLocation = new Location(nextTravelLocation.row(), nextTravelLocation.col() - 1);
+		}	
+		if (!rightWall) {
+			rightLocation = new Location(nextTravelLocation.row(), nextTravelLocation.col() + 1);
+		}
+		if (!upWall) {
+			upLocation = new Location(nextTravelLocation.row() - 1, nextTravelLocation.col());
+		}
+		if (!downWall) {
+			downLocation = new Location(nextTravelLocation.row() + 1, nextTravelLocation.col());
+		}
+		// create an array of the locations
+		Location[] locations = {leftLocation, rightLocation, upLocation, downLocation};
+		// create an array of the directions
+		Direction[] directions = {LEFT, RIGHT, UP, DOWN};
+		int directionIndex = -1;
+		// for each of the locations if not null, calculate the distance between the target location and the location
+		double[] distances = new double[4];
+		for (int i = 0; i < locations.length; i++) {
+			if (locations[i] != null) {
+				distances[i] = calculateDistance(locations[i], targetLocation);
+			}
+		}
+		// Take the absolute value of the distances
+		for (int i = 0; i < distances.length; i++) {
+			distances[i] = Math.abs(distances[i]);
+		}
+		// find the minimum distance within the given error, ERR, for double comparison
+		double minDistance = Double.MAX_VALUE;
+		for (int i = 0; i < distances.length; i++) {
+			if (distances[i] < minDistance) {
+				minDistance = distances[i];
+				directionIndex = i;
+			}
+		}
+		// create boolean array to check to compare the distances by subtracting the minimum distance from the distances
+		int minDistancesMatches = 0;
+		for (int i = 0; i < distances.length; i++) {
+			if (distances[i] - minDistance < ERR) {
+				minDistancesMatches++;
+			}
+		}
+		// if matches greater than one choose a TOP, LEFT, DOWN, RIGHT direction if wall variable for that direction is false as a direction respectively
+		if (minDistancesMatches > 1) {
+			if (!upWall && currentDirection != Direction.DOWN) {
+				nextDirection = Direction.UP;
+				turning = true;
+			} else if (!leftWall && currentDirection != Direction.RIGHT) {
+				nextDirection = Direction.LEFT;
+				turning = true;
+			} else if (!downWall && currentDirection != Direction.UP) {
+				nextDirection = Direction.DOWN;
+				turning = true;
+			} else if (!rightWall && currentDirection != Direction.LEFT) {
+				nextDirection = Direction.RIGHT;
+				turning = true;
+			}
+		}else{
+			// if matches is one, set the nextDirection to the direction at the directionIndex
+			nextDirection = directions[directionIndex];
+			if(nextDirection != currentDirection){
+				turning = true;
+			}
+		}
+
+
+
+	}
+
+
+	private Location getTravelNextLocation(Direction dir) {
+		// Returns the location adjacent to the current location in the given direction of travel
+		if (dir == null) {
+			return currentLocation;
+		}
+		int dRow = 0;
+		int dCol = 0;
+		switch (dir) {
+		case UP:
+			dRow = -1;
+			break;
+		case DOWN:
+			dRow = 1;
+			break;
+		case LEFT:
+			dCol = -1;
+			break;
+		case RIGHT:
+			dCol = 1;
+			break;
+		}
+		return new Location(currentLocation.row() + dRow, currentLocation.col() + dCol);
+	}
+
+	protected boolean isTurning() {
+		return turning;
+	}
+
+	protected Location getScatterTarget(){
+		return scatterTarget;
+	}
+
+	protected Descriptor getCurrentDescription() {
+		return currentDesc;
+	}
+
+	protected void setCurrentSpeed(double speed) {
+		currentIncrement = speed;
+	}
+
+	protected double calculateDistance(Location loc1, Location loc2) {
+		// Calculate the distance between two locations
+		double x1 = loc1.col();
+		double y1 = loc1.row();
+		double x2 = loc2.col();
+		double y2 = loc2.row();
+		return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+	}
+
+	public Direction getHomeDirection() {
+		// Gets the direction of the ghost's home location from the current location
+		Location currentLoc = new Location((int) getRowExact(), (int) getColExact()) ;
+		Location homeLoc = getHomeLocation();
+		if (currentLoc.row() > homeLoc.row()) {
+			return UP;
+		}
+		else if (currentLoc.row() < homeLoc.row()) {
+			return DOWN;
+		}
+		else if (currentLoc.col() > homeLoc.col()) {
+			return LEFT;
+		}
+		else {
+			return RIGHT;
+		}	
+	}
+
+
+	public void update(Descriptor description) {
+		// Given a descriptor, update the state of the ghost
+		// Add or subtract the ghost's current increment from the ghost's exact location using the current direction
+		currentLocation = new Location((int) getRowExact(), (int) getColExact()) ;
+		if (this.getCurrentDirection() == null){
+			return;
+		}		
+		double increment = getCurrentIncrement();
+		double curColExact = getColExact();
+		double curRowExact = getRowExact();
+		int rowNum = (int) curRowExact;
+		int colNum = (int) curColExact;
+		if(turning) {
+			handleTurn();
+		}
+
+		// get the distance to the center of the cell 
+		double distanceToCenter = distanceToCenter();
+
+		//using current direction switch statement to update the exact location
+		switch (getCurrentDirection()) {
+			case LEFT:
+				// tunnel special case
+				if(curColExact - increment - 0.5 < 0) {
+					curColExact = maze.getNumColumns() + (curColExact - increment - 0.5);
+				}else{
+					if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum,  colNum - 1)) {
+						increment = distanceToCenter;
+					}
+					curColExact -= increment;
+				}
+				break;
+			case RIGHT: 
+				//special case for tunnel 
+				if(curRowExact + increment + 0.5 > maze.getNumRows()) {
+					curRowExact = (curRowExact + increment + 0.5) - maze.getNumRows();
+				}else{
+					if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum,  colNum + 1)) {
+						increment = distanceToCenter;
+					}
+					curRowExact += increment;
+				}
+				break;
+			case UP:
+				if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum - 1,  colNum)) {
+					increment = distanceToCenter;
+				}
+				curRowExact -= increment;
+				break;
+			case DOWN:
+				if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum + 1,  colNum)) {
+					increment = distanceToCenter;
+				}
+				curRowExact += increment;
+				break;
+			}
+			setRowExact(curRowExact);
+			setColExact(curColExact);
+	}
+
+
+	public double getBaseIncrement() {
+		return baseIncrement;
+	}
+
+
+	/**
+	 * MODE MODE MODE MODE MODE
+	 */
+	public void setMode(Mode gMode, Descriptor Description) {
+		//		return new Descriptor(playerLoc, playerDir, enemyLoc)
+		Mode previousMode = currentMode;
+		currentMode = gMode;
+		if(Description != null) {
+			calculateNextCell(Description);
+		}
+		// if previous mode is chase or scatter set reverseDirection to true
+		if(previousMode == Mode.CHASE || previousMode == Mode.SCATTER) {
+			reverseDirection = true;
+		}
+
+		// Adjust the ghost speed according to the mode
+		if (gMode == Mode.FRIGHTENED) {
+			currentIncrement = baseIncrement * (2.0/3.0);
+		}else if(gMode == Mode.DEAD) {
+			currentIncrement = baseIncrement * (2.0);
+		}else {
+			currentIncrement = baseIncrement;
+		}
+	}
+	public Mode getMode() {
+		return currentMode;
+	}
+	/**
+	 * DIRECTION DIRECTION DIRECTION DIRECTION
+	 */
+	public void setDirection(Direction dir) {
+		currentDirection = dir;
+	}
+	public Direction getCurrentDirection() {
+		return currentDirection;
+	}
+
+	/**
+	 * LOCATION LOCATION LOCATION LOCATION
+	 */
+	public Location getCurrentLocation() {
+		return currentLocation;
+	}
+	public Location getHomeLocation() {
+		return home;
+	}
+
+
+	/**
+	 * EXACT EXACT EXACT EXACT 
+	 */
+	public void setColExact(double c) {
+		colExact = c;
+	}
+	public void setRowExact(double r) {
+		rowExact = r;
+	}
+	public double getColExact() {
+		return colExact;
+	} 
+	public double getRowExact() {
+		return rowExact;
+	}
+
+
+	public Location getNextCell() {
+		if(currentDesc != null) {
+			calculateNextCell(currentDesc);
+			return nextLocation;
+		}else{
+			// if there is no descriptor, return the current location minus 1 in the direction of travel
+			// if current direction is UP, return current location minus 1 in the UP direction
+			if(currentDirection == Direction.UP) {
+				nextLocation = new Location(currentLocation.row() - 1, currentLocation.col());
+			}else if(currentDirection == Direction.DOWN) {
+				nextLocation = new Location(currentLocation.row() + 1, currentLocation.col());
+			}else if(currentDirection == Direction.LEFT) {
+				nextLocation = new Location(currentLocation.row(), currentLocation.col() - 1);
+			}else if(currentDirection == Direction.RIGHT) {
+				nextLocation = new Location(currentLocation.row(), currentLocation.col() + 1);
+			}
+		}
+		return nextLocation;
+	}
+
+
+	/**
+	 * When turning, we need to update along the previous direction
+	 * of travel until lined up with the new row or column.
+	 */
+	protected void handleTurn() {
+		double increment = getCurrentIncrement();
+		double currentRowExact = getRowExact();
+		double currentColumnExact = getColExact();
+
+		if (this.previousDirection == UP) {
+			double distanceToTravel = this.getRowExact() - this.turnTarget;
+			if (increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				//Reached the center!
+				turning = false;
+			}
+			currentRowExact -= increment;
+		}else if (this.previousDirection == DOWN) {
+			double distanceToTravel = turnTarget - currentRowExact;
+			if (increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				turning = false;
+			}
+			currentRowExact += increment;
+		}else if(this.previousDirection == LEFT) {
+			double distanceToTravel = currentColumnExact - turnTarget;
+			if(increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				turning = false;
+			}
+			currentColumnExact -= increment;
+		}else if(this.previousDirection == RIGHT) {
+			double distanceToTravel = turnTarget - currentColumnExact;
+			if(increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				turning = false;
+			}
+			currentColumnExact += increment;
+		}
+		setColExact(currentColumnExact);
+		setRowExact(currentRowExact);
+	}
+	/**
+	 * Determines the distance to the center of the cell through the 
+	 * difference between the current position and the center of the 
+	 * current cell
+	 * @return
+	 */
+	protected double distanceToCenter() {
+		double columnPosition = getColExact();
+		double rowPosition = getRowExact();
+		switch(getCurrentDirection()) {
+			case LEFT: 
+				return columnPosition - ((int) columnPosition)- 0.5;
+			case RIGHT: 
+				return 0.5 - (columnPosition - ((int) columnPosition));
+			case UP: 
+				return rowPosition - ((int) rowPosition) - 0.5;
+			case DOWN: 
+				return 0.5 - (rowPosition - ((int) rowPosition));
+		}
+		return 0;
+	}
+}

@@ -1,0 +1,107 @@
+package hw4;
+
+import api.Descriptor;
+import api.Direction;
+import api.Location;
+import api.MazeMap;
+
+/**
+ * 
+ * @author Conner Ohnesorge
+ *
+ */
+public class Pacmang extends SuperClass{
+
+	Pacmang(MazeMap maze, Location home, double baseSpeed, Direction homeDirection) {
+		super(maze, home, baseSpeed, homeDirection);
+	}
+
+	@Override
+	public void reset() {
+		Location homeLocation = this.getHomeLocation();
+		this.setColExact(homeLocation.row() + 0.5);
+		this.setRowExact(homeLocation.col() + 0.5);
+		this.setDirection(this.getHomeDirection());
+		this.currentIncrement = this.getBaseIncrement();
+		this.turning = false;
+	}
+
+	public void update(Descriptor d) {
+		if(this.getCurrentDirection() == null) {
+			return;
+		}
+		
+		if(this.turning) {
+			super.handleTurn();
+		}
+		
+		double increment = this.getCurrentIncrement();
+		double currentRowExact = this.getRowExact();
+		double currentColExact = this.getColExact();
+		int rowNum = (int) this.getRowExact();
+		int colNum = (int) this.getColExact() ;   
+		
+		// distance to center of cell we are in, in the direction of travel, can be negative    
+		double diff = this.distanceToCenter();
+
+		switch(getCurrentDirection())
+		{     
+		  // tricky bit: if we are approaching a wall, adjust increment if needed,
+		  // so we end up in the center of the cell
+
+		  case LEFT:
+			// special case: check whether we are in the tunnel and need to wrap around
+			if (currentColExact - increment - 0.5 < 0)
+			{
+			  currentColExact = maze.getNumColumns() + (currentColExact - increment - 0.5);
+			}
+			else
+			{
+			  // if we are approaching a wall, be sure we stop moving
+			  // at the center of current cell.  This only applies when
+			  // 'diff' is positive but small enough that we can't move a full
+			  // increment
+			  if (diff > -ERR && diff < increment && maze.isWall(rowNum, colNum - 1))
+			  {
+				increment = diff;
+			  }
+			  currentColExact -= increment;         
+			}
+			break;       
+		  case RIGHT:
+			// special case: check whether we are in the tunnel and need to wrap around
+			if (currentColExact + increment + 0.5 >= maze.getNumColumns())
+			{
+			  currentColExact = currentColExact + increment + 0.5 - maze.getNumColumns();
+			}
+			else
+			{
+			  if (diff > -ERR && diff < increment && maze.isWall(rowNum, colNum + 1))
+			  {
+				increment = diff;
+			  }
+			  currentColExact += increment;
+			}
+			break;        
+		  case UP:
+			if (diff > -ERR && diff < increment && maze.isWall(rowNum - 1, colNum))
+			{
+			  increment = diff;
+			}
+			currentRowExact -= increment;       
+			break;
+		  case DOWN:
+			if (diff > -ERR && diff < increment && maze.isWall(rowNum + 1, colNum))
+			{
+			  increment = diff;
+			}
+			currentRowExact += increment;
+			break;
+		}
+		
+		// finally, update instance vars
+		setRowExact(currentRowExact);
+		setColExact(currentColExact);
+  }
+
+}

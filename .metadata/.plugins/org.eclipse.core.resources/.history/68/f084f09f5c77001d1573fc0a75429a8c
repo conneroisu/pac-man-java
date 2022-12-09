@@ -1,0 +1,27 @@
+package hw4;
+
+import java.util.Random;
+
+import api.Descriptor;
+import api.Direction;
+import api.Location;
+import api.MazeMap;
+import api.Mode;
+
+public class Blinky extends SuperClass{
+
+	public Blinky(MazeMap maze, Location home, double baseSpeed, Direction homeDirection, Location scatterTarget,
+			Random rand) {
+		super(maze, home, baseSpeed, homeDirection, scatterTarget, rand);
+	}
+
+
+	private Location getTargetLocation(Descriptor desc) {
+		// get the location of the player
+		Location playerLocation = desc.getPlayerLocation();
+		// return the location of the player as the target location
+		return playerLocation;
+	}
+	
+
+}

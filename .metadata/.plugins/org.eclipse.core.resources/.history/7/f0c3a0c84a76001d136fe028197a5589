@@ -1,0 +1,275 @@
+package hw4;
+
+import java.util.Random;
+import api.MazeMap;
+import api.Mode;
+import api.Location;
+import api.Actor;
+import api.Descriptor;
+
+import api.Descriptor;
+import api.Direction;
+import api.MazeCell;
+import static api.Direction.RIGHT;
+import static api.Direction.UP;
+import static api.Direction.LEFT;
+import static api.Direction.DOWN;
+
+public abstract class SuperClass implements Actor{
+	protected static final double ERR = 0.001; //Margin of error for comparing exact coordinates to the center of a cell
+	// SPEED
+	protected double baseIncrement;
+	protected double currentSpeed; 
+	protected double currentIncrement;
+
+
+	protected MazeMap maze; // A read-only representation of the maze for detecting walls and edges
+	protected Location scatterTarget; // The scatter location for scatter mode
+	protected Location home;
+	protected Location currentLocation; // The current location 
+	protected Location nextLocation;
+	protected Descriptor currentDesc;
+	protected double colExact;
+	protected double rowExact;
+	protected double turnTarget;
+
+	//DIRECTIONS
+	protected Direction currentDirection; // Current Direction
+	protected Direction nextDirection; // The Next Direction
+	protected Direction homeDirection;
+	protected Direction previousDirection;
+	
+	private Mode currentMode; // The Current Mode
+	protected boolean turning;
+	
+	/**
+	 * Constructor for SuperClass for Player Initialization Parameters
+	 * @param maze
+	 * @param home
+	 * @param baseSpeed
+	 * @param homeDirection
+	 */
+	SuperClass(MazeMap maze, Location home, double baseSpeed, Direction homeDirection) {
+		this.maze = maze;
+		this.home = home;
+		this.baseIncrement = baseSpeed;
+		this.currentIncrement = baseSpeed;
+		this.homeDirection = homeDirection;
+	}
+	/**
+	 * Constructor for SuperClass for Ghost Initialization Parameters
+	 * @param maze
+	 * @param home
+	 * @param baseSpeed
+	 * @param homeDirection
+	 * @param scatterTarget
+	 * @param rand
+	 */
+	SuperClass(MazeMap maze, Location home, double baseSpeed, Direction homeDirection, Location scatterTarget, Random rand) {
+		this.baseIncrement = baseSpeed;
+		this.maze = maze;
+		this.currentDirection = homeDirection;
+		this.home = home;
+		this.colExact = home.col();
+		this.rowExact = home.row();	
+		this.scatterTarget = scatterTarget;
+		this.currentIncrement = baseSpeed;
+		this.homeDirection = homeDirection;
+	}
+
+	// ABSTRACT ABSTRACT ABSTRACT ABSTRACT 
+	public void reset() {
+		this.setMode(Mode.INACTIVE, null);
+		this.currentSpeed = this.baseIncrement;
+		this.setDirection(this.getHomeDirection());
+		this.currentLocation = home;
+	}
+
+	public double getCurrentIncrement() {
+		return this.baseIncrement;
+	}
+
+
+	public void calculateNextCell(Descriptor d)
+	{
+		Location currentLoc = new Location((int) getRowExact(), (int) getColExact()) ;
+		
+
+
+	if (currentLoc.row() > 2)
+	  {
+		nextLocation = new Location(currentLoc.row(), currentLoc.col() + 1);
+	  }
+	  else
+	  {
+		nextLocation = new Location(currentLoc.row(), currentLoc.col() + 1);
+	  }
+	}
+
+
+	public Direction getHomeDirection() {
+		// Gets the direction of the ghost's home location from the current location
+		Location currentLoc = new Location((int) getRowExact(), (int) getColExact()) ;
+		Location homeLoc = getHomeLocation();
+		if (currentLoc.row() > homeLoc.row()) {
+			return UP;
+		}
+		else if (currentLoc.row() < homeLoc.row()) {
+			return DOWN;
+		}
+		else if (currentLoc.col() > homeLoc.col()) {
+			return LEFT;
+		}
+		else {
+			return RIGHT;
+		}	
+	}
+
+
+	public void update(Descriptor description) {
+		// Given a descriptor, update the state of this actor
+		if(getMode() != Mode.INACTIVE) {
+		}else { 
+			
+		}
+
+
+	}
+
+
+	public double getBaseIncrement() {
+		return this.baseIncrement;
+	}
+
+
+	/**
+	 * MODE MODE MODE MODE MODE
+	 */
+	public void setMode(Mode gMode, Descriptor Description) {
+		//		return new Descriptor(playerLoc, playerDir, enemyLoc)
+		this.currentMode = gMode;
+		if(Description != null) {
+			calculateNextCell(Description);
+		}
+
+		// Adjust the ghost speed according to the mode
+		if (gMode == Mode.FRIGHTENED) {
+			this.currentSpeed = this.baseIncrement * (2.0/3.0);
+		}else if(gMode == Mode.DEAD) {
+			this.currentSpeed = this.baseIncrement * (2.0);
+		}else {
+			this.currentSpeed = this.baseIncrement;
+		}
+	}
+	public Mode getMode() {
+		return this.currentMode;
+	}
+
+	/**
+	 * DIRECTION DIRECTION DIRECTION DIRECTION
+	 */
+	public void setDirection(Direction dir) {
+		this.currentDirection = dir;
+	}
+	public Direction getCurrentDirection() {
+		return this.currentDirection;
+	}
+
+	/**
+	 * LOCATION LOCATION LOCATION LOCATION
+	 */
+	public Location getCurrentLocation() {
+		return this.currentLocation;
+	}
+	public Location getHomeLocation() {
+		return this.home;
+	}
+
+
+	/**
+	 * EXACT EXACT EXACT EXACT 
+	 */
+	public void setColExact(double c) {
+		this.colExact = c;
+	}
+	public void setRowExact(double r) {
+		this.rowExact = r;
+	}
+	public double getColExact() {
+		return this.colExact;
+	} 
+	public double getRowExact() {
+		return this.rowExact;
+	}
+
+
+	public Location getNextCell() {
+		this.calculateNextCell(this.currentDesc);
+		return nextLocation;
+	}
+
+
+	/**
+	 * When turning, we need to update along the previous direction
+	 * of travel until lined up with the new row or column.
+	 */
+	protected void handleTurn() {
+		double increment = this.getCurrentIncrement();
+		double currentRowExact = this.getRowExact();
+		double currentColumnExact = this.getColExact();
+
+		if (this.previousDirection == UP) {
+			double distanceToTravel = this.getRowExact() - this.turnTarget;
+			if (increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				//Reached the center!
+				this.turning = false;
+			}
+			currentRowExact -= increment;
+		}else if (this.previousDirection == DOWN) {
+			double distanceToTravel = turnTarget - currentRowExact;
+			if (increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				this.turning = false;
+			}
+			currentRowExact += increment;
+		}else if(this.previousDirection == LEFT) {
+			double distanceToTravel = currentColumnExact - turnTarget;
+			if(increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				this.turning = false;
+			}
+			currentColumnExact -= increment;
+		}else if(this.previousDirection == RIGHT) {
+			double distanceToTravel = turnTarget - currentColumnExact;
+			if(increment >= distanceToTravel - ERR) {
+				increment = distanceToTravel;
+				this.turning = false;
+			}
+			currentColumnExact += increment;
+		}
+		this.setColExact(currentColumnExact);
+		this.setColExact(currentColumnExact);
+	}
+	/**
+	 * Determines the distance to the center of the cell through the 
+	 * difference between the current position and the center of the 
+	 * current cell
+	 * @return
+	 */
+	protected double distanceToCenter() {
+		double columnPosition = this.getColExact();
+		double rowPosition = this.getRowExact();
+		switch(this.getCurrentDirection()) {
+			case LEFT: 
+				return columnPosition - ((int) columnPosition)- 0.5;
+			case RIGHT: 
+				return 0.5 - (columnPosition - ((int) columnPosition));
+			case UP: 
+				return rowPosition - ((int) rowPosition) - 0.5;
+			case DOWN: 
+				return 0.5 - (rowPosition - ((int) rowPosition));
+		}
+		return 0;
+	}
+}

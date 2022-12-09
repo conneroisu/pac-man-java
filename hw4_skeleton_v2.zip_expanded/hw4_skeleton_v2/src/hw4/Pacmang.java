@@ -1,0 +1,245 @@
+package hw4;
+
+import api.Descriptor;
+import api.Direction;
+import api.Location;
+import api.MazeMap;
+
+import api.Direction.*;
+
+/**
+ * 
+ * @author Conner Ohnesorge
+ *
+ */
+public class Pacmang extends SuperClass{
+
+	public Pacmang(MazeMap maze, Location home, double baseSpeed, Direction homeDirection) {
+		super(maze, home, baseSpeed, homeDirection);
+	}
+
+	
+	
+	@Override
+	public void reset() {
+		Location homeLocation = this.getHomeLocation();
+		this.setColExact(homeLocation.row() + 0.5);
+		this.setRowExact(homeLocation.col() + 0.5);
+		this.setDirection(this.getHomeDirection());
+		this.currentIncrement = this.getBaseIncrement();
+		this.turning = false;
+	}
+
+	public void update(Descriptor d) {
+		if(this.getCurrentDirection() == null) {
+			return;
+		}
+		
+		if(this.turning) {
+			super.handleTurn();
+		}
+		
+		double increment = this.getCurrentIncrement();
+		double currentRowExact = this.getRowExact();
+		double currentColExact = this.getColExact();
+		int rowNum = (int) this.getRowExact();
+		int colNum = (int) this.getColExact() ;   
+		
+		// distance to center of cell we are in, in the direction of travel, can be negative    
+		double diff = this.distanceToCenter();
+
+		switch(getCurrentDirection())
+		{     
+		  // tricky bit: if we are approaching a wall, adjust increment if needed,
+		  // so we end up in the center of the cell
+
+		  case LEFT:
+			// special case: check whether we are in the tunnel and need to wrap around
+			if (currentColExact - increment - 0.5 < 0)
+			{
+			  currentColExact = maze.getNumColumns() + (currentColExact - increment - 0.5);
+			}
+			else
+			{
+			  // if we are approaching a wall, be sure we stop moving
+			  // at the center of current cell.  This only applies when
+			  // 'diff' is positive but small enough that we can't move a full
+			  // increment
+			  if (diff > -ERR && diff < increment && maze.isWall(rowNum, colNum - 1))
+			  {
+				increment = diff;
+			  }
+			  currentColExact -= increment;         
+			}
+			break;       
+		  case RIGHT:
+			// special case: check whether we are in the tunnel and need to wrap around
+			if (currentColExact + increment + 0.5 >= maze.getNumColumns())
+			{
+			  currentColExact = currentColExact + increment + 0.5 - maze.getNumColumns();
+			}
+			else
+			{
+			  if (diff > -ERR && diff < increment && maze.isWall(rowNum, colNum + 1))
+			  {
+				increment = diff;
+			  }
+			  currentColExact += increment;
+			}
+			break;        
+		  case UP:
+			if (diff > -ERR && diff < increment && maze.isWall(rowNum - 1, colNum))
+			{
+			  increment = diff;
+			}
+			currentRowExact -= increment;       
+			break;
+		  case DOWN:
+			if (diff > -ERR && diff < increment && maze.isWall(rowNum + 1, colNum))
+			{
+			  increment = diff;
+			}
+			currentRowExact += increment;
+			break;
+		}
+
+		
+		// finally, update instance vars
+		setRowExact(currentRowExact);
+		setColExact(currentColExact);
+  }
+
+  /**
+   * Attempts to set the direction to the given new direction.  This may occur
+   * slightly before reaching the new row or column, allowing the player to "cut"
+   * the corner; in that case, we enter "turning" mode: this sets the new direction,
+   * but also remembers the previous direction in order to keep moving along
+   * the previous direction as well as the new direction until aligned with the 
+   * new row or column.
+   * @param newDir
+   *   desired direction of travel for the player
+   */
+  public void tryTurn(Direction newDir)
+  {      
+    if (turning)
+    {
+      // can't change direction in the middle of a turn
+      return;
+    }
+
+    // easy cases first: not actually changing direction, just maybe reversing
+    Direction currentDir = getCurrentDirection();
+    if (   ((newDir == Direction.LEFT || newDir == Direction.RIGHT) && (currentDir == Direction.LEFT || currentDir == Direction.RIGHT || currentDir == null))
+        || ((newDir == Direction.UP || newDir == Direction.DOWN) && (currentDir == Direction.UP || currentDir == Direction.DOWN || currentDir == null)))
+    {   
+      currentDirection = newDir;
+      return;
+    }
+
+    double rowPos = getRowExact();
+    double colPos = getColExact();
+    int colNum = (int) getColExact();
+    int rowNum = (int) getRowExact();
+
+    // max distance before new row/column that we can start a turn
+    double tolerance = 1.0;
+
+    int newColNum = colNum;
+    int newRowNum = rowNum;
+    double diff = 0;
+
+    if (newDir == Direction.LEFT || newDir == Direction.RIGHT)
+    {
+      // Idea - figure out whether a turn is possible within the next 'tolerance'
+      // cell units, which could include the current cell or one cell ahead.
+      // So, if we are before the center of current cell, possible turn direction
+      // is the cell to left or right.  But if we are past the center of current
+      // cell, then possible turn is at the *next* row left or right.
+
+      // Note: if we are currently in the tunnel, that is ok because
+      // we can't be currently moving up or down
+      newColNum = newDir == Direction.LEFT ? colNum - 1 : colNum + 1;
+      if (currentDir == Direction.UP)
+      {
+        // distance to center
+        diff = rowPos - ((int) rowPos) - 0.5;          
+        if (diff < 0) 
+        {
+          // past the center, we must be trying to turn at next cell up
+          diff = diff + 1;
+          newRowNum -= 1;
+        }
+      }
+      else if (currentDir == Direction.DOWN)
+      {
+        diff = 0.5 - (rowPos - ((int) rowPos));
+        if (diff < 0) 
+        {
+          // past the center, try next cell up
+          diff = diff + 1;
+          newRowNum += 1;
+        }
+      }
+    }
+    else
+    {
+      // Note: if we are currently in the tunnel, this is still ok because
+      // we are only checking walls based on the current column number
+      newRowNum = newDir == Direction.UP ? rowNum - 1 : rowNum + 1;
+      if (currentDir == Direction.LEFT)
+      {
+        diff = colPos - ((int) colPos) - 0.5;
+        if (diff < 0)
+        {
+          diff += 1;
+          newColNum -= 1;
+        }
+      }
+      else if (currentDir == Direction.RIGHT)
+      {
+        diff = 0.5 - (colPos - colNum);
+        if (diff < 0)
+        {
+          diff += 1;
+          newColNum += 1;
+        }
+      }
+    }
+
+
+    if (diff >= 0 && diff < tolerance && !maze.isWall(newRowNum, newColNum))
+    {
+      // after all that, we can actually decide to turn!
+      setDirection(newDir);
+      
+      // if we are not exactly aligned with new direction, then
+      // go into 'turning' mode and continue to adjust along previous
+      // direction with the next few update() calls.  For this, we 
+      // need the previous direction, and it is also helpful to
+      // record the centerline for the desired new row or column
+      // (the 'turnTarget').
+      if (diff > 0)
+      {
+        turning = true;
+        previousDirection = currentDir;
+        if (currentDir == Direction.UP || currentDir == Direction.DOWN)
+        {
+          // centerline of new row
+          turnTarget = newRowNum + 0.5;
+        }
+        else
+        {
+          // centerline of new column
+          turnTarget = newColNum + 0.5;
+        }
+      }
+    }
+  }
+
+
+  @Override
+  public void calculateNextCell(Descriptor d) {
+    //do nothing 
+  } 
+
+}
