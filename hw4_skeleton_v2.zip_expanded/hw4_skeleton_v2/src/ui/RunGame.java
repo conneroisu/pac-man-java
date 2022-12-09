@@ -25,7 +25,7 @@ public class RunGame
   public static final String[] TEST1 = {
     "#######",
     "#*...*#",
-    "#.###.#",
+    "#.#.#.#",
     "#.....#",
     "#.#B#.#",
     "#.#.#.#",

@@ -1,0 +1,392 @@
+package hw4;
+
+import java.util.Random;
+import api.MazeMap;
+import api.Mode;
+import api.Location;
+import api.Actor;
+import api.Descriptor;
+
+import api.Descriptor;
+import api.Direction;
+import api.MazeCell;
+import static api.Direction.RIGHT;
+import static api.Direction.UP;
+import static api.Direction.LEFT;
+import static api.Direction.DOWN;
+
+public abstract class SuperSpookyClass implements Actor{
+	private static final double ERR = 0.001; //Margin of error for comparing exact coordinates to the center of a cell
+	// SPEED
+	private double baseIncrement;
+
+
+	protected MazeMap maze; // A read-only representation of the maze for detecting walls and edges
+	@SuppressWarnings("unused") //used within ghost class
+	private Location scatterTarget; // The scatter location for scatter mode
+	private Location home;
+	private double colExact;
+	private double rowExact;
+
+	//CURRENT
+	private Location currentLocation; // The current location 
+	private Descriptor currentDesc;
+	private double currentIncrement;
+
+	//Random
+	protected Random rand;
+	//NEXT
+	private Direction nextDirection; // The Next Direction
+	private Location nextLocation; // The Next Location
+
+	private Direction currentDirection; // Current Direction
+	private Direction homeDirection;
+	
+	private Mode currentMode; // The Current Mode
+	
+	/**
+	 * Constructor for SuperClass for Ghost Initialization Parameters
+	 * @param maze
+	 * @param home
+	 * @param baseSpeed
+	 * @param homeDirection
+	 * @param scatterTarget
+	 * @param rand
+	 */
+	SuperSpookyClass(MazeMap maze, Location home, double baseSpeed, Direction homeDirection, Location scatterTarget, Random rand) {
+		this.baseIncrement = baseSpeed;
+		this.maze = maze;
+		this.home = home;
+		this.rowExact = home.row() + 0.5;
+		this.colExact = home.col() + 0.5;
+		this.scatterTarget = scatterTarget;
+		this.currentIncrement = baseSpeed;
+		this.homeDirection = homeDirection;
+		this.currentDirection = homeDirection;
+	}
+
+	/**
+	 * 
+	 */
+	public void reset() {
+		setMode(Mode.INACTIVE, null);
+		currentIncrement = baseIncrement;
+		setDirection(homeDirection);
+		currentLocation = home;
+	}
+
+	public double getCurrentIncrement() {
+		return baseIncrement;
+	}
+
+	abstract Location getTargetLocation(Descriptor desc);
+
+	//helper method to convert a location to an Double array with the exact coordinates
+	private double[] locationToExact(Location loc) {
+		double[] exact = new double[2];
+		exact[0] = loc.row() + 0.5;
+		exact[1] = loc.col() + 0.5;
+		return exact;
+	}
+
+	/**
+	 * Returns the location that the actor will arrive at after moving one increment with the current direction.
+	 * @return
+	 */
+	private Location tBAL (){
+		//returns the to be arrived at location
+		double[] exact = locationToExact(currentLocation);
+		double row = exact[0];
+		double col = exact[1];
+		if (currentDirection == Direction.RIGHT) {
+			col += currentIncrement;
+		}
+		else if (currentDirection == Direction.LEFT) {
+			col -= currentIncrement;
+		}
+		else if (currentDirection == Direction.UP) {
+			row -= currentIncrement;
+		}
+		else if (currentDirection == Direction.DOWN) {
+			row += currentIncrement;
+		}
+		return new Location((int) row, (int) col);
+	}
+
+	/**
+	 * Returns the neighbors of the to be arrived at location as their lo-
+	 * cation but null if they are walls, out of bounds, or the opposite 
+	 * direction of the current direction
+	 * @param tBAL - The to be arrived at location which is the location that the ghost will arrive at after moving one increment with the current direction.
+	 * @return
+	 */
+	private Location[] getNeighbors(Location tBAL) {
+		Location[] neighbors = new Location[4];
+		if(tBAL.row() - 1 >= 0 && !maze.isWall(tBAL.row() - 1, tBAL.col()) && getCurrentDirection() != Direction.DOWN)
+		{
+			neighbors[0] = new Location(tBAL.row() - 1, tBAL.col());
+		}else {
+			neighbors[0] = null;
+		}
+		if(tBAL.row() + 1 < maze.getNumRows() && !maze.isWall(tBAL.row() + 1, tBAL.col()) && getCurrentDirection() != Direction.UP)
+		{
+			neighbors[1] = new Location(tBAL.row() + 1, tBAL.col());
+		}else {
+			neighbors[1] = null;
+		}
+		if(tBAL.col() - 1 >= 0 && !maze.isWall(tBAL.row(), tBAL.col() - 1) && getCurrentDirection() != Direction.RIGHT)
+		{
+			neighbors[2] = new Location(tBAL.row(), tBAL.col() - 1);
+		}else {
+			neighbors[2] = null;
+		}
+
+		if(tBAL.col() + 1 < maze.getNumColumns() && !maze.isWall(tBAL.row(), tBAL.col() + 1) && getCurrentDirection() != Direction.LEFT)
+		{
+			neighbors[3] = new Location(tBAL.row(), tBAL.col() + 1);
+		}else {
+			neighbors[3] = null;
+		}
+
+		return neighbors;
+	}
+
+	//helper method for scaring ghost makes my methods prettier
+	private boolean scaredUtil() {
+		if(getMode() == Mode.FRIGHTENED)
+		{
+		//Sets the next direction to the opposite of the current direction
+		if(currentDirection == Direction.UP) {
+			nextDirection = Direction.DOWN;
+		}
+		else if(currentDirection == Direction.DOWN) {
+			nextDirection = Direction.UP;
+		}
+		else if(currentDirection == Direction.LEFT) {
+			nextDirection = Direction.RIGHT;
+		}
+		else if(currentDirection == Direction.RIGHT) {
+			nextDirection = Direction.LEFT;
+		}
+		//Set the next location to the location that the actor will arrive at after moving one increment with the next direction
+		double row = getRowExact();
+		double col = getColExact();
+		if (nextDirection == Direction.RIGHT) {
+			col += currentIncrement;
+		}
+		else if (nextDirection == Direction.LEFT) {
+			col -= currentIncrement;
+		}
+		else if (nextDirection == Direction.UP) {
+			row -= currentIncrement;
+		}
+		else if (nextDirection == Direction.DOWN) {
+			row += currentIncrement;
+		}
+		nextLocation = new Location((int) row, (int) col);
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	public void calculateNextCell(Descriptor d){
+		
+		// Check for INACTIVE AND SCARED
+		if(getMode() == Mode.INACTIVE) {
+			return;
+		}
+		if(scaredUtil()) {
+			return;
+		}
+
+		Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
+		Location TBAL = tBAL(); // To be arrived at location/ To be arrived at later location
+		Location[] neighbors = getNeighbors(TBAL); // Neighbors of the to be arrived at location 
+		int neighborIndex = 4; // Tracks the index of the neighbor to be chosen(4 is an invalid index)
+		Location targetLocation = getTargetLocation(d);
+		double smallestDistance = Double.MAX_VALUE; // Tracks the smallest distance between the Target Location and the neighboring cells
+		double calculatedDistanceTween; // Tracks the distance between the Target Location and the neighboring cell being checked
+
+		// find the smallest distance using getDistance between the Target Location and the tbal
+		for(int i = 0; i < neighbors.length; i++) {
+			if(neighbors[i] != null) {
+				calculatedDistanceTween = calculateDistanceTween(neighbors[i], targetLocation);
+				//ties disputed with index in distances array (lower index wins)
+				if(Math.abs(calculatedDistanceTween - smallestDistance) < ERR){
+					if(i < neighborIndex) {
+						neighborIndex = i;
+						smallestDistance = calculatedDistanceTween;
+					}
+				}
+			}
+		}
+		// Set the nextDirection 
+		nextDirection = directions[neighborIndex];
+		// Set the nextLocation
+		nextLocation = neighbors[neighborIndex];
+	}
+
+	/**
+	 * Calculates the distance between two given locations using the distance formula \sqrt{ (x_{1}-x_{2})^{2}+(y_{1}-y_{2})^{2} }
+	 * @param loc1
+	 * @param loc2
+	 * @return
+	 */
+	protected double calculateDistanceTween(Location loc1, Location loc2) {
+		// Calculate the distance between a Location and another Location
+		double x1 = loc1.col();
+		double y1 = loc1.row();
+		double x2 = loc2.col();
+		double y2 = loc2.row();
+		return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+	}
+
+	public Direction getHomeDirection() {
+		// Gets the direction of the ghost's home location from the current location
+		Location currentLoc = new Location((int) getRowExact(), (int) getColExact()) ;
+		Location homeLoc = getHomeLocation();
+		if (currentLoc.row() > homeLoc.row()) {
+			return UP;
+		}
+		else if (currentLoc.row() < homeLoc.row()) {
+			return DOWN;
+		}
+		else if (currentLoc.col() > homeLoc.col()) {
+			return LEFT;
+		}
+		else {
+			return RIGHT;
+		}	
+	}
+
+
+	public void update(Descriptor description) {
+		// Given a descriptor, update the state of the ghost
+		// Add or subtract the ghost's current increment from the ghost's exact location using the current direction
+		currentLocation = new Location((int) getRowExact(), (int) getColExact()) ;
+		currentDesc = description;
+
+		// INACTIVE CHECK
+		if (getMode() == Mode.INACTIVE){ return; }		
+
+		double increment = getCurrentIncrement();
+		double curColExact = getColExact();
+		double currentRowExact = getRowExact();
+		int rowNum = (int) currentRowExact;
+		int colNum = (int) curColExact;
+
+		calculateNextCell(description);
+
+		currentDirection = nextDirection;
+
+		// get the distance to the center of the cell 
+		double distanceToCenter = distanceToCenter();
+
+		//using current direction switch statement to update the exact location
+		switch (getCurrentDirection()) {
+			case LEFT:
+				// tunnel special case
+				if(curColExact - increment - 0.5 < 0) {
+					curColExact = maze.getNumColumns() + (curColExact - increment - 0.5);
+				}else{
+					if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum,  colNum - 1)) {
+						increment = distanceToCenter;
+					}
+					curColExact -= increment;
+				}
+				break;
+			case RIGHT: 
+				//special case for tunnel 
+				if(currentRowExact + increment + 0.5 > maze.getNumRows()) {
+					currentRowExact = (currentRowExact + increment + 0.5) - maze.getNumRows();
+				}else{
+					if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum,  colNum + 1)) {
+						increment = distanceToCenter;
+					}
+					currentRowExact += increment;
+				}
+				break;
+			case UP:
+				if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum - 1,  colNum)) {
+					increment = distanceToCenter;
+				}
+				currentRowExact -= increment;
+				break;
+			case DOWN:
+				if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNum + 1,  colNum)) {
+					increment = distanceToCenter;
+				}
+				currentRowExact += increment;
+				break;
+			}
+//			setRowExact(curRowExact);
+//			setColExact(curColExact);
+//		currentLocation = new Location((int) getRowExact(), (int) getColExact()) ;
+			updateLocation(currentRowExact, curColExact);
+	}
+
+	private void updateLocation(double curRowExact, double curColExact) {
+			setRowExact(curRowExact);
+			setColExact(curColExact);
+			currentLocation = new Location((int) getRowExact(), (int) getColExact()) ;
+	}
+	public double getBaseIncrement() {
+		return baseIncrement;
+	}
+
+	public void setMode(Mode gMode, Descriptor Description) 
+	{
+		currentMode = gMode;
+		if(Description != null) { calculateNextCell(Description); }
+		// Mode Based adjust of Current Increment
+		if (gMode == Mode.FRIGHTENED) {
+			currentIncrement = baseIncrement * (2.0/3.0);
+		}else if(gMode == Mode.DEAD) {
+			currentIncrement = baseIncrement * (2.0);
+		}else { currentIncrement = baseIncrement; }
+	}
+
+	public Mode getMode() {
+		return currentMode;
+	}
+
+		
+	public void setDirection(Direction dir) { currentDirection = dir; }
+
+	public Direction getCurrentDirection() { return currentDirection; }
+
+	public Location getCurrentLocation() { return currentLocation; }
+
+	public Location getHomeLocation() { return home; }
+
+
+	public void setColExact(double c) { colExact = c; }
+	public void setRowExact(double r) { rowExact = r; }
+	public double getColExact() { return colExact; } 
+	public double getRowExact() { return rowExact; }
+	public Location getNextCell() { return nextLocation; }
+
+
+	/**
+	 * Determines the distance to the center of the cell through the 
+	 * difference between the current position and the center of the 
+	 * current cell
+	 * @return
+	 */
+	protected double distanceToCenter() {
+		double columnPosition = getColExact();
+		double rowPosition = getRowExact();
+		switch(getCurrentDirection()) {
+			case LEFT: 
+				return columnPosition - ((int) columnPosition)- 0.5;
+			case RIGHT: 
+				return 0.5 - (columnPosition - ((int) columnPosition));
+			case UP: 
+				return rowPosition - ((int) rowPosition) - 0.5;
+			case DOWN: 
+				return 0.5 - (rowPosition - ((int) rowPosition));
+		}
+		return 0;
+	}
+}

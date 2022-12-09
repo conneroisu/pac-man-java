@@ -1,2 +1,5 @@
 1670435318430	Rename type 'blunky'
 1670547189347	Delete element
+1670610793035	Delete element
+1670613030329	Rename local variable 'curRowExact'
+1670618735732	Rename local variable 'curColExact'

@@ -18,7 +18,7 @@ public class Pacman implements Actor
    * Margin of error for comparing exact position to centerline
    * of cell.
    */
-  public static final double ERR = .001;
+  public static final double ERR = 0.001;
 
   /**
    * Maze configuration.
