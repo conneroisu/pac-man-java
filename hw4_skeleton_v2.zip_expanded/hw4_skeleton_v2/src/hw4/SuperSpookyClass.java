@@ -270,11 +270,10 @@ public abstract class SuperSpookyClass implements Actor{
 		double currentRowExact = getRowExact();
 		int rowNum = (int) currentRowExact;
 		int colNum = (int) currentColumnExact;
-		updateLocation(currentRowExact, currentColumnExact);
 
 		calculateNextCell(description);
 
-		currentDirection = nextDirection;
+		// currentDirection = nextDirection;
 
 		// get the distance to the center of the cell 
 		double distanceToCenter = distanceToCenter();
@@ -316,13 +315,15 @@ public abstract class SuperSpookyClass implements Actor{
 				currentRowExact += increment;
 				break;
 			}
+			updateLocation(currentRowExact, currentColumnExact);
 	}
-
+	// Helper method so that we ensure that the location is updated in the same way every time 
 	private void updateLocation(double curRowExact, double curColExact) {
 			setRowExact(curRowExact);
 			setColExact(curColExact);
 			currentLocation = new Location((int) getRowExact(), (int) getColExact()) ;
 	}
+
 	public double getBaseIncrement() {
 		return baseIncrement;
 	}
@@ -356,14 +357,10 @@ public abstract class SuperSpookyClass implements Actor{
 			return 0;
 		}
 		switch(getCurrentDirection()) {
-			case LEFT: 
-				return columnPosition - ((int) columnPosition)- 0.5;
-			case RIGHT: 
-				return 0.5 - (columnPosition - ((int) columnPosition));
-			case UP: 
-				return rowPosition - ((int) rowPosition) - 0.5;
-			case DOWN: 
-				return 0.5 - (rowPosition - ((int) rowPosition));
+			case LEFT: return (columnPosition - ((int) columnPosition) - 0.5);
+			case RIGHT: return (0.5 - (columnPosition - ((int) columnPosition)));
+			case UP: return (rowPosition - ((int) rowPosition) - 0.5);
+			case DOWN: return (0.5 - (rowPosition - ((int) rowPosition)));
 		}
 		return 0;
 	}
