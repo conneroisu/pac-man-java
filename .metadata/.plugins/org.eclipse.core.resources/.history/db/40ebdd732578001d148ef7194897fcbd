@@ -2,6 +2,8 @@ package ui;
 
 import api.PacmanGame;
 import hw4.Blinky;
+import junit.framework.Test;
+
 import static api.Mode.*;
 
 /**
@@ -18,7 +20,7 @@ public class SimpleTest2
     "#S.........#",
     "############",     
   };
-  
+ 
   public static void main(String[] args)
   {
 
@@ -44,6 +46,40 @@ public class SimpleTest2
   System.out.println(b.getRowExact() + ", " + b.getColExact()); // still 2.5, 2.5
   System.out.println();
   
+    int n = 0
+    while(n != 10) {
+      b.update(SimpleTest.makeDescriptor(game));
+      n++;
+    //Print the current Direction for Blinky
+    System.out.println(b.getCurrentDirection());
+    if(i == 0){
+      System.out.println("Expected: UP");
+    }else if(i == 1){
+      System.out.println("Expected: RIGHT");
+    }
+    // Print the next cell for Blinky
+    System.out.println(b.getNextCell()); 
+    if(i == 0){
+      System.out.println("Expected: (2, 3)");
+    }else if(i == 1){
+      System.out.println("Expected: (3, 2)");
+    }
+    //Print the current direction for Blinky
+    System.out.println(b.getCurrentDirection());
+    if(i == 0){
+      System.out.println("Expected: UP");
+    }else if(i == 1){
+      System.out.println("Expected: RIGHT");
+    }
+    b.update(SimpleTest.makeDescriptor(game));
+    
+    //Print the exact location for Blinky with a preface
+    System.out.println("Exact Location: " + b.getRowExact() + ", " + b.getColExact());
+    
+    if(i == 1){
+      System.out.println("Expected: 2.5, 2.5");
+    }
+    }
   // a similar test using CHASE mode
   game = new PacmanGame(SIMPLE2, 10);
   b = (Blinky) game.getEnemies()[0];

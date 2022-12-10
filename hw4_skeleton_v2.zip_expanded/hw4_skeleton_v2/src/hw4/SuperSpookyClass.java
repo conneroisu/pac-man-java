@@ -25,6 +25,7 @@ public abstract class SuperSpookyClass implements Actor{
 	private Location scatterTarget; // The scatter location for scatter mode
 	private Location home;
 	private Location currentLocation; // The current location 
+	private Location previousLocation;
 	private Location nextLocation; // The Next Location
 	private Direction nextDirection; // The Next Direction
 	private Direction currentDirection; // Current Direction
@@ -32,9 +33,9 @@ public abstract class SuperSpookyClass implements Actor{
 	private Mode currentMode; // The Current Mode
 	private double colExact;
 	private double rowExact;
-
 	private double currentIncrement;
-
+	private boolean pastCenter;
+	private boolean atCenter;
 	protected Random rand;
 
 	
@@ -64,40 +65,34 @@ public abstract class SuperSpookyClass implements Actor{
 		setMode(Mode.INACTIVE, null);
 		currentIncrement = baseIncrement;
 		setDirection(homeDirection);
-		currentLocation = home;
+		updateLocation(home.row() + 0.5, home.col() + 0.5);
 	}
 
-
-	//helper method to convert a location to an Double array with the exact coordinates
-	private double[] locationToExact(Location loc) {
-		double[] exact = new double[2];
-		exact[0] = loc.row() + 0.5;
-		exact[1] = loc.col() + 0.5;
-		return exact;
-	}
 
 	/**
-	 * Returns the location that the actor will arrive at after moving one increment with the current direction.
+	 * Returns the current location of the actor.
 	 * @return
 	 */
 	private Location tBAL (){
-		//returns the to be arrived at location
-		double[] exact = locationToExact(currentLocation);
-		double row = exact[0];
-		double col = exact[1];
+
+		//get the current location
+		int row = getCurrentLocation().row();
+		int col = getCurrentLocation().col();
+
+		
 		if (currentDirection == Direction.RIGHT) {
-			col += currentIncrement;
+			col += 0;
 		}
 		else if (currentDirection == Direction.LEFT) {
-			col -= currentIncrement;
+			col -= 0;
 		}
 		else if (currentDirection == Direction.UP) {
-			row -= currentIncrement;
+			row -= 0;
 		}
 		else if (currentDirection == Direction.DOWN) {
-			row += currentIncrement;
+			row += 0;
 		}
-		return new Location((int) row, (int) col);
+		return new Location(row, col);
 	}
 
 	/**
@@ -110,7 +105,7 @@ public abstract class SuperSpookyClass implements Actor{
 	private Location[] getNeighbors(Location tBAL) {
 		Location[] neighbors = new Location[4];
 
-		if(tBAL.row() - 1 >= 0 && !maze.isWall(tBAL.row() - 1, tBAL.col()) && getCurrentDirection() != Direction.DOWN)
+		if(tBAL.row() - 1 >= 0  && !maze.isWall(tBAL.row() - 1, tBAL.col()) && getCurrentDirection() != Direction.DOWN)
 		{
 			neighbors[0] = new Location(tBAL.row() - 1, tBAL.col());
 		}else {
@@ -142,10 +137,10 @@ public abstract class SuperSpookyClass implements Actor{
 	}
 
 	//helper method for scaring ghost makes my methods prettier
-	private boolean scaredUtil() {
+	private boolean scaredUtil(Descriptor desc) {
 		if(getMode() == Mode.FRIGHTENED)
 		{
-		//Sets the next direction to the opposite of the current direction
+		//Sets the next direction to the opposite of the current direction if is not wall
 		if(currentDirection == Direction.UP) {
 			nextDirection = Direction.DOWN;
 		}
@@ -158,65 +153,47 @@ public abstract class SuperSpookyClass implements Actor{
 		else if(currentDirection == Direction.RIGHT) {
 			nextDirection = Direction.LEFT;
 		}
+		return true;
 		//Set the next location to the location that the actor will arrive at after moving one increment with the next direction
-		double row = getRowExact();
-		double col = getColExact();
-		if (nextDirection == Direction.RIGHT) {
-			col += currentIncrement;
 		}
-		else if (nextDirection == Direction.LEFT) {
-			col -= currentIncrement;
-		}
-		else if (nextDirection == Direction.UP) {
-			row -= currentIncrement;
-		}
-		else if (nextDirection == Direction.DOWN) {
-			row += currentIncrement;
-		}
-		nextLocation = new Location((int) row, (int) col);
-			return true;
-		}else{
-			return false;
-		}
+		return false;
 	}
 
 
 	public void calculateNextCell(Descriptor d){
-		
+		if(pastCenter) {
+			return;
+		}
 		// Check for INACTIVE AND SCARED
+		updateLocation(getRowExact(), getColExact());
 		if(getMode() == Mode.INACTIVE) { return; }
-		if(scaredUtil()) { return; }
+		if(scaredUtil(d)) { return; }
 
 		Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
-		Location TBAL = tBAL(); // To be arrived at location/ To be arrived at later location
+		Location TBAL = tBAL(); // To be arrived at Location(To be arrived at later location)
 		Location[] neighbors = getNeighbors(TBAL); // Neighbors of the to be arrived at location 
 		Location targetLocation = getTargetLocation(d);
 		int neighborIndex = 4; // Tracks the index of the neighbor to be chosen(4 is an invalid index)
-		int sm = 0; // Tracker for gettings an intial value for the smallest distance
-		double smallestDistance = 0.0; // Tracks the smallest distance between the Target Location and the neighboring cells
+		double smallestDistance = 128.0; // Tracks the smallest distance between the Target Location and the neighboring cells
 		// Get a singular distance from the neighbors array to the targetLocation that isn't null
-		while(smallestDistance == 0.0)
-		{
-			sm++;
-			if(neighbors[sm] != null){
-				smallestDistance = calculateDistanceTween(neighbors[sm], targetLocation);
-			}else if(sm == 3) {
-				return;
-			}
-		}
 		
 		double calculatedDistanceTween; // Tracks the distance between the Target Location and the neighboring cell being checked
 
+		int i;
 		// find the smallest distance using getDistance between the Target Location and the tbal
-		for(int i = 0; i < neighbors.length; i++) {
+		for(i = 0; i < neighbors.length; i++) {
 			if(neighbors[i] != null) {
 				calculatedDistanceTween = calculateDistanceTween(neighbors[i], targetLocation);
 				//ties disputed with index in distances array (lower index wins)
-				if(Math.abs(calculatedDistanceTween - smallestDistance) < ERR){
-					if(i < neighborIndex) {
-						neighborIndex = i;
-						smallestDistance = calculatedDistanceTween;
-					}
+				if((calculatedDistanceTween - smallestDistance < ERR && calculatedDistanceTween - smallestDistance > -ERR) || calculatedDistanceTween < smallestDistance){
+						//set the neighbor index to the current index if the distance is smaller
+						if(calculatedDistanceTween - ERR < smallestDistance && calculatedDistanceTween + ERR < smallestDistance){
+							neighborIndex = i;
+							smallestDistance = calculatedDistanceTween;
+						}else if(i < neighborIndex){
+							neighborIndex = i;
+							smallestDistance = calculatedDistanceTween;
+						}
 				}
 			}
 		}
@@ -262,7 +239,6 @@ public abstract class SuperSpookyClass implements Actor{
 
 	public void update(Descriptor description) {
 
-		// INACTIVE CHECK
 		if (getMode() == Mode.INACTIVE){ return; }		
 
 		double increment = getCurrentIncrement();
@@ -273,11 +249,11 @@ public abstract class SuperSpookyClass implements Actor{
 
 		calculateNextCell(description);
 
-		// currentDirection = nextDirection;
 
 		// get the distance to the center of the cell 
 		double distanceToCenter = distanceToCenter();
 
+		previousLocation = new Location((int)currentRowExact,(int)currentColumnExact);	
 		//using current direction switch statement to update the exact location
 		switch (getCurrentDirection()) {
 			case LEFT:
@@ -315,7 +291,31 @@ public abstract class SuperSpookyClass implements Actor{
 				currentRowExact += increment;
 				break;
 			}
+
+			//update the current location	
 			updateLocation(currentRowExact, currentColumnExact);
+			//get the distance to the center of the cell
+			//Check if we have gone past the center of the cell
+			//if distance to center is within the bounds of the error arround zero, we have reached the center
+			distanceToCenter = distanceToCenter();
+			if(distanceToCenter < ERR && distanceToCenter > ERR) {
+				pastCenter = false;	
+			}else if(distanceToCenter < ERR) {
+				pastCenter = true;
+			}else if (distanceToCenter > -ERR){
+				pastCenter = false;	
+			}
+				//update the current direction to the next direction
+				pastCenter = true;
+	
+			if(!pastCenter){
+				//if we have not reached the center of the cell, update the next direction
+				if(previousLocation != currentLocation){
+					currentDirection = nextDirection;
+					//update the next cell
+					calculateNextCell(description);
+				}
+			}
 	}
 	// Helper method so that we ensure that the location is updated in the same way every time 
 	private void updateLocation(double curRowExact, double curColExact) {
@@ -331,7 +331,7 @@ public abstract class SuperSpookyClass implements Actor{
 	public void setMode(Mode gMode, Descriptor Description) 
 	{
 		currentMode = gMode;
-		if(Description != null) { calculateNextCell(Description); }
+		calculateNextCell(Description); 
 		// Mode Based adjust of Current Increment
 		if (gMode == Mode.FRIGHTENED) {
 			currentIncrement = baseIncrement * (2.0/3.0);
@@ -353,9 +353,9 @@ public abstract class SuperSpookyClass implements Actor{
 	protected double distanceToCenter() {
 		double columnPosition = getColExact();
 		double rowPosition = getRowExact();
-		if(getCurrentDirection() == null) {
-			return 0;
-		}
+
+		if(getCurrentDirection() == null) { return 0; }
+
 		switch(getCurrentDirection()) {
 			case LEFT: return (columnPosition - ((int) columnPosition) - 0.5);
 			case RIGHT: return (0.5 - (columnPosition - ((int) columnPosition)));
@@ -380,7 +380,7 @@ public abstract class SuperSpookyClass implements Actor{
 	public double getColExact() { return colExact; } 
 	public double getRowExact() { return rowExact; }
 	public Location getNextCell() { return nextLocation; }
-	public double getCurrentIncrement() { return baseIncrement; } 
+	public double getCurrentIncrement() { return currentIncrement; } 
 	protected Location getScatterTarget() { return scatterTarget; } 
 	abstract Location getTargetLocation(Descriptor desc);
 

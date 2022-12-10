@@ -596,7 +596,7 @@ public class PacmanGame
    * Make a descriptor for current game state.
    * @return
    */
-  private Descriptor makeDescriptor()
+  protected Descriptor makeDescriptor()
   {
     Location enemyLoc = null;
     if (enemies.length > 0)
