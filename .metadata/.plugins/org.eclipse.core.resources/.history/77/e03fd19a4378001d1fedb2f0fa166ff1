@@ -261,7 +261,7 @@ public abstract class SuperSpookyClass implements Actor{
 				if(currentColumnExact - increment - 0.5 < 0) {
 					currentColumnExact = maze.getNumColumns() + (currentColumnExact - increment - 0.5);
 				}else{
-					if(distanceToCenter > -ERR && distanceToCenter < increment) {
+					if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNumber,  columnNumber - 1)) {
 						increment = distanceToCenter;
 						atCenter = true;
 					}
@@ -273,7 +273,7 @@ public abstract class SuperSpookyClass implements Actor{
 				if(currentRowExact + increment + 0.5 > maze.getNumRows()) {
 					currentRowExact = (currentRowExact + increment + 0.5) - maze.getNumRows();
 				}else{
-					if(distanceToCenter > -ERR && distanceToCenter < increment ) {
+					if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNumber,  columnNumber + 1)) {
 						increment = distanceToCenter;
 						atCenter = true;
 					}
@@ -281,14 +281,14 @@ public abstract class SuperSpookyClass implements Actor{
 				}
 				break;
 			case UP:
-				if(distanceToCenter > -ERR && distanceToCenter < increment) {
+				if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNumber - 1,  columnNumber)) {
 					increment = distanceToCenter;
 					atCenter = true;
 				}
 				currentRowExact -= increment;
 				break;
 			case DOWN:
-				if(distanceToCenter > -ERR && distanceToCenter < increment ) {
+				if(distanceToCenter > -ERR && distanceToCenter < increment && maze.isWall(rowNumber + 1,  columnNumber)) {
 					increment = distanceToCenter;
 					atCenter = true;
 				}
