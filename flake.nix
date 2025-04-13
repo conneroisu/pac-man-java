@@ -43,6 +43,12 @@
             exec = ''${pkgs.git}/bin/git clean -fdx'';
             description = "Clean Project";
           };
+          run = {
+            exec = ''
+              # TODO: Add support for running the project
+            '';
+            description = "Run Java Language Server";
+          };
         };
 
         # Convert scripts to packages
@@ -77,6 +83,7 @@
 
               # Java
               jdk23
+              jdt-language-server
             ]
             ++ (with pkgs;
               lib.optionals stdenv.isDarwin [
