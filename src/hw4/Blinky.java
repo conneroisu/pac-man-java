@@ -7,11 +7,24 @@ import api.Location;
 import api.MazeMap;
 import api.Mode;
 
-public class Blinky extends SuperSpookyClass{
+public class Blinky extends SuperSpookyClass {
 
-	public Blinky(MazeMap maze, Location home, double baseSpeed, Direction homeDirection, Location scatterTarget,
-			Random rand) {
-		super(maze, home, baseSpeed, homeDirection, scatterTarget, rand);
+	public Blinky(
+		MazeMap maze,
+		Location home,
+		double baseSpeed,
+		Direction homeDirection,
+		Location scatterTarget,
+		Random rand
+	) {
+		super(
+			maze,
+			home,
+			baseSpeed,
+			homeDirection,
+			scatterTarget,
+			rand
+		);
 	}
 
 
