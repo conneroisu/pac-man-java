@@ -102,7 +102,12 @@ public class PacmanPanel extends JPanel
       for (int col = 0; col < game.getNumColumns(); ++col)
       {
         g.setColor(Color.BLACK);
-        g.fillRect(col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE);         
+        g.fillRect(
+          col * CELL_SIZE,
+          row * CELL_SIZE,
+          CELL_SIZE,
+          CELL_SIZE
+        );         
 
         
         //Color color = getColor(row, col);
@@ -110,36 +115,34 @@ public class PacmanPanel extends JPanel
         if (c.isWall())
         {
           g.setColor(WALL_COLOR);
-          g.drawRect(col * CELL_SIZE + BORDER_SIZE / 2, row * CELL_SIZE + BORDER_SIZE / 2, BORDER_SIZE, BORDER_SIZE);
+          g.drawRect(
+            col * CELL_SIZE + BORDER_SIZE / 2,
+            row * CELL_SIZE + BORDER_SIZE / 2,
+            BORDER_SIZE,
+            BORDER_SIZE
+          );
         }
         else
         {
           if (c.getType() == CellType.DOT && c.canEat())
           {
             g.setColor(Color.WHITE);
-            g.fillOval(col * CELL_SIZE + (CELL_SIZE - PELLET_SIZE) / 2, row * CELL_SIZE + (CELL_SIZE - PELLET_SIZE) / 2, PELLET_SIZE, PELLET_SIZE);
+            g.fillOval(
+              col * CELL_SIZE + (CELL_SIZE - PELLET_SIZE) / 2,
+              row * CELL_SIZE + (CELL_SIZE - PELLET_SIZE) / 2,
+              PELLET_SIZE,
+              PELLET_SIZE
+            );
           }
           else if (c.getType() == CellType.ENERGIZER && c.canEat())
           {
             g.setColor(Color.LIGHT_GRAY);
-            //g.fillOval(col * cellSize + (cellSize - PELLET_SIZE) / 2, row * cellSize + (cellSize - PELLET_SIZE) / 2, PELLET_SIZE, PELLET_SIZE);
             g.fillOval(col * CELL_SIZE + BORDER_SIZE / 2, row * CELL_SIZE + BORDER_SIZE / 2, BORDER_SIZE, BORDER_SIZE);
             
           }
         }
       }
     }
-    
-    // draw grid ?
-//    g.setColor(GRID_COLOR);
-//    for (int row = 0; row < maze.getNumRows(); ++row)
-//    {
-//      for (int col = 0; col < maze.getNumColumns(); ++col)
-//      {
-//        g.drawRect(col * cellSize, row * cellSize, cellSize, cellSize);
-//      }
-//    }
-
     
     drawPacman(g);
     drawGhosts(g);
