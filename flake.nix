@@ -45,9 +45,11 @@
           };
           run = {
             exec = ''
-              # TODO: Add support for running the project
+              mkdir -p bin
+              ${pkgs.jdk23}/bin/javac -d bin src/**/*.java
+              ${pkgs.jdk23}/bin/java -cp bin ui.RunGame
             '';
-            description = "Run Java Language Server";
+            description = "Compile and run the PacMan game";
           };
         };
 
