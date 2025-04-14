@@ -13,83 +13,58 @@ import api.MazeMap;
 import api.Mode;
 
 public class Pacman implements Actor {
-  /**
-   * Margin of error for comparing exact position to centerline
-   * of cell.
-   */
+  /** Margin of error for comparing exact position to centerline of cell. */
   public static final double ERR = 0.001;
 
-  /**
-   * Maze configuration.
-   */
+  /** Maze configuration. */
   private MazeMap maze;
 
-  /**
-   * Initial location on reset().
-   */
+  /** Initial location on reset(). */
   private Location home;
 
-  /**
-   * Initial direction on reset().
-   */
+  /** Initial direction on reset(). */
   private Direction homeDirection;
 
-  /**
-   * Current direction of travel.
-   */
+  /** Current direction of travel. */
   private Direction currentDirection;
 
-  /**
-   * Basic speed increment, used to determine currentIncrement.
-   */
+  /** Basic speed increment, used to determine currentIncrement. */
   private double baseIncrement;
 
-  /**
-   * Current speed increment, added in direction of travel each frame.
-   */
+  /** Current speed increment, added in direction of travel each frame. */
   private double currentIncrement;
 
   /**
-   * Row (y) coordinate, in units of cells. The row number for the
-   * currently occupied cell is always the int portion of this value.
+   * Row (y) coordinate, in units of cells. The row number for the currently occupied cell is always
+   * the int portion of this value.
    */
   private double rowExact;
 
   /**
-   * Column (x) coordinate, in units of cells. The column number for the
-   * currently occupied cell is always the int portion of this value.
+   * Column (x) coordinate, in units of cells. The column number for the currently occupied cell is
+   * always the int portion of this value.
    */
   private double colExact;
 
   /**
-   * Flag indicating that the player is in "turning" mode, that is,
-   * moving on a diagonal in a new direction of travel and simultaneously in the
-   * previous direction of travel.
+   * Flag indicating that the player is in "turning" mode, that is, moving on a diagonal in a new
+   * direction of travel and simultaneously in the previous direction of travel.
    */
   private boolean turning;
 
-  /**
-   * When in turning mode, records the previous direction of travel.
-   */
+  /** When in turning mode, records the previous direction of travel. */
   private Direction previousDirection;
 
-  /**
-   * When in turning mode, records the centerline of the new row or column.
-   */
+  /** When in turning mode, records the centerline of the new row or column. */
   private double turnTarget;
 
   /**
-   * Constructs a new Pacman with the given maze, home location, base speed,
-   * and initial direction.
-   * 
-   * @param maze
-   *                      maze configuration
-   * @param home
-   *                      initial location
-   * @param baseSpeed
-   *                      base speed increment
-   * @param homeDirection
-   *                      initial direction
+   * Constructs a new Pacman with the given maze, home location, base speed, and initial direction.
+   *
+   * @param maze maze configuration
+   * @param home initial location
+   * @param baseSpeed base speed increment
+   * @param homeDirection initial direction
    */
   public Pacman(MazeMap maze, Location home, double baseSpeed, Direction homeDirection) {
     this.maze = maze;
@@ -176,16 +151,13 @@ public class Pacman implements Actor {
   }
 
   /**
-   * Attempts to set the direction to the given new direction. This may occur
-   * slightly before reaching the new row or column, allowing the player to "cut"
-   * the corner; in that case, we enter "turning" mode: this sets the new
-   * direction,
-   * but also remembers the previous direction in order to keep moving along
-   * the previous direction as well as the new direction until aligned with the
+   * Attempts to set the direction to the given new direction. This may occur slightly before
+   * reaching the new row or column, allowing the player to "cut" the corner; in that case, we enter
+   * "turning" mode: this sets the new direction, but also remembers the previous direction in order
+   * to keep moving along the previous direction as well as the new direction until aligned with the
    * new row or column.
-   * 
-   * @param newDir
-   *               desired direction of travel for the player
+   *
+   * @param newDir desired direction of travel for the player
    */
   public void tryTurn(Direction newDir) {
     if (turning) {
@@ -195,8 +167,10 @@ public class Pacman implements Actor {
 
     // easy cases first: not actually changing direction, just maybe reversing
     Direction currentDir = getCurrentDirection();
-    if (((newDir == LEFT || newDir == RIGHT) && (currentDir == LEFT || currentDir == RIGHT || currentDir == null))
-        || ((newDir == UP || newDir == DOWN) && (currentDir == UP || currentDir == DOWN || currentDir == null))) {
+    if (((newDir == LEFT || newDir == RIGHT)
+            && (currentDir == LEFT || currentDir == RIGHT || currentDir == null))
+        || ((newDir == UP || newDir == DOWN)
+            && (currentDir == UP || currentDir == DOWN || currentDir == null))) {
       currentDirection = newDir;
       return;
     }
@@ -356,8 +330,8 @@ public class Pacman implements Actor {
   }
 
   /**
-   * When in "turning" mode, we need to update along the previous
-   * direction of travel until lined up with the new row or column.
+   * When in "turning" mode, we need to update along the previous direction of travel until lined up
+   * with the new row or column.
    */
   private void handleTurn() {
     double increment = getCurrentIncrement();
@@ -404,8 +378,8 @@ public class Pacman implements Actor {
   }
 
   /**
-   * Determines the difference between current position and center of
-   * current cell, in the direction of travel.
+   * Determines the difference between current position and center of current cell, in the direction
+   * of travel.
    */
   private double distanceToCenter() {
     double colPos = getColExact();
@@ -422,5 +396,4 @@ public class Pacman implements Actor {
     }
     return 0;
   }
-
 }

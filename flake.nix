@@ -71,33 +71,19 @@
             exec = ''${pkgs.maven}/bin/mvn test'';
             description = "Run all tests with Maven";
           };
-          mvn-test-simple = {
+          lint = {
             exec = ''
-              cd $REPO_ROOT
-              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTest
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+              ${pkgs.checkstyle}/bin/checkstyle -c $REPO_ROOT/checkstyle.xml ./.
             '';
-            description = "Run SimpleTest";
+            description = "Lint with statix";
           };
-          mvn-test-simple1a = {
+          format = {
             exec = ''
-              cd $REPO_ROOT
-              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTest1a
+              export REPO_ROOT=$(git rev-parse --show-toplevel)
+              find $REPO_ROOT -name "*.java" -type f | xargs ${pkgs.google-java-format}/bin/google-java-format --replace
             '';
-            description = "Run SimpleTest1a";
-          };
-          mvn-test-simple3 = {
-            exec = ''
-              cd $REPO_ROOT
-              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTest3
-            '';
-            description = "Run SimpleTest3";
-          };
-          mvn-test-frightened = {
-            exec = ''
-              cd $REPO_ROOT
-              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTestFrightened
-            '';
-            description = "Run SimpleTestFrightened";
+            description = "Format Java code with Google Java Format";
           };
         };
 
@@ -135,6 +121,7 @@
               jdk23
               jdt-language-server
               maven
+              checkstyle
             ]
             ++ (with pkgs;
               lib.optionals stdenv.isDarwin [

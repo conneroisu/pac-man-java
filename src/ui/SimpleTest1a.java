@@ -1,83 +1,66 @@
 package ui;
+
+import static api.Mode.*;
+
 import api.Descriptor;
 import api.Direction;
 import api.Location;
 import api.PacmanGame;
 import hw4.Blinky;
 
-import static api.Direction.RIGHT;
-import static api.Direction.UP;
-import static api.Mode.*;
-
-/**
- * Some ideas for initially testing the update() method.
- */
+/** Some ideas for initially testing the update() method. */
 
 // Same idea as SimpleTest.java, but instead of assuming a bogus implementation
-// of calculateNextCell, this assumes you have calculateNextCell and 
+// of calculateNextCell, this assumes you have calculateNextCell and
 // setMode working correctly
 
-public class SimpleTest1a
-{
-  
+public class SimpleTest1a {
+
   public static final String[] SIMPLE1a = {
-    "#######",
-    "#.....#",
-    "#....S#",
-    "#.....#",
-    "#.....#",
-    "#..B..#",
-    "#.....#",
-    "#######",     
+    "#######", "#.....#", "#....S#", "#.....#", "#.....#", "#..B..#", "#.....#", "#######",
   };
-  
-  
-  public static void main(String[] args)
-  {
+
+  public static void main(String[] args) {
     // using a frame rate of 10, the speed increment will be 0.4
     PacmanGame game = new PacmanGame(SIMPLE1a, 10);
-    
+
     // Blinky is always at index 0 in the enemies array
     Blinky b = (Blinky) game.getEnemies()[0];
-        
-    
-    
+
     // verify initial state is INACTIVE
     System.out.println("Check initial state");
-    System.out.println(b.getMode());  // INACTIVE
-    System.out.println(b.getRowExact() + ", " + b.getColExact());  // 5.5, 3.5
-    
+    System.out.println(b.getMode()); // INACTIVE
+    System.out.println(b.getRowExact() + ", " + b.getColExact()); // 5.5, 3.5
+
     // calculateNextCell does nothing when in INACTIVE mode
     b.calculateNextCell(makeDescriptor(game));
-    System.out.println(b.getNextCell());  // still null
-    
+    System.out.println(b.getNextCell()); // still null
+
     // update does nothing when in INACTIVE mode
     b.update(makeDescriptor(game));
-    System.out.println(b.getRowExact() + ", " + b.getColExact());  // still 5.5, 3.5
+    System.out.println(b.getRowExact() + ", " + b.getColExact()); // still 5.5, 3.5
     System.out.println("----------");
     System.out.println();
-    
-    
+
     System.out.println("Setting SCATTER mode");
     // this should invoke calculateNextCell after setting mode
     b.setMode(SCATTER, null);
-    System.out.println(b.getMode());  // SCATTER
+    System.out.println(b.getMode()); // SCATTER
     System.out.println(b.getNextCell()); // expected (4, 3)
     System.out.println();
-    
+
     System.out.println("Do six calls to update():");
-    for (int i = 0; i < 6; ++i)
-    {
+    for (int i = 0; i < 6; ++i) {
       b.update(makeDescriptor(game));
       System.out.println(b.getRowExact() + ", " + b.getColExact());
       System.out.println(b.getCurrentDirection());
       System.out.println(b.getNextCell());
-    }    
+    }
     // Expected: should be at 3.1, 3.5 with next cell (2, 3) and direction UP
     System.out.println("----------");
     System.out.println();
-    
-    System.out.println("Setting CHASE mode");   
+
+    System.out.println("Setting CHASE mode");
     b.setMode(CHASE, makeDescriptor(game));
     System.out.println(b.getRowExact() + ", " + b.getColExact());
     System.out.println(b.getCurrentDirection());
@@ -85,7 +68,7 @@ public class SimpleTest1a
     System.out.println();
     // Expected: still at 3.1, 3.5 with next cell (2, 3) and direction UP
     // Our target in CHASE mode is now Pacman, at (2, 5), so going right to (3, 4) would
-    // take us closer.  But since we are already past the center of cell (3, 3), 
+    // take us closer.  But since we are already past the center of cell (3, 3),
     // the implicit call to calculateNextCell from setMode does nothing (i.e, since
     // we are already past the center of our current cell, we can't change direction here)
     System.out.println("----------");
@@ -96,7 +79,7 @@ public class SimpleTest1a
     System.out.println(b.getRowExact() + ", " + b.getColExact());
     System.out.println(b.getCurrentDirection());
     System.out.println(b.getNextCell());
-    // Expected: crossing into our next cell (2, 3) triggers a call to calculateNextCell.  
+    // Expected: crossing into our next cell (2, 3) triggers a call to calculateNextCell.
     // Now the closest neighboring cell to target is to the right at (2, 4).
     // Current direction is still UP
     System.out.println("----------");
@@ -112,10 +95,9 @@ public class SimpleTest1a
     // so we end up at 2.5, 3.5 and the current direction is now RIGHT.
     System.out.println("----------");
     System.out.println();
-   
+
     System.out.println("Do three more calls to update():");
-    for (int i = 0; i < 3; ++i)
-    {
+    for (int i = 0; i < 3; ++i) {
       b.update(makeDescriptor(game));
       System.out.println(b.getRowExact() + ", " + b.getColExact());
       System.out.println(b.getCurrentDirection());
@@ -123,10 +105,8 @@ public class SimpleTest1a
     }
     // Expected: should end up at 2.5, 4.7 with next cell (2, 5)
   }
-  
-  
-  public static Descriptor makeDescriptor(PacmanGame game)
-  {
+
+  public static Descriptor makeDescriptor(PacmanGame game) {
     Location enemyLoc = game.getEnemies()[0].getCurrentLocation();
     Location playerLoc = game.getPlayer().getCurrentLocation();
     Direction playerDir = game.getPlayer().getCurrentDirection();
