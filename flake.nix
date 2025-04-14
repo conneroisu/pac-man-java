@@ -86,6 +86,7 @@
               # Java
               jdk23
               jdt-language-server
+              maven
             ]
             ++ (with pkgs;
               lib.optionals stdenv.isDarwin [
