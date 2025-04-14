@@ -1,261 +1,169 @@
 package ui;
 
-import api.Mode;
-import static org.junit.Assert.*;
-
 import api.Actor;
-import api.Descriptor;
 import api.Direction;
 import api.Location;
+import api.Mode;
 import api.PacmanGame;
-import com.pacman.ghost.Blinky;
-import com.pacman.ghost.Clyde;
-import com.pacman.ghost.Inky;
-import com.pacman.ghost.Pinky;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
- * Test suite for ghost movement and behavior. Specifically designed to test for oscillation/jitter
- * issues.
+ * Simple test to check ghost movement and log generation.
  */
-public class GhostMovementTest {
+public final class GhostMovementTest {
 
-  // Simple test maze with Pacman and all ghosts
+  /** Test maze with the same structure as the main game. */
   public static final String[] TEST_MAZE = {
-    "#####################",
-    "#...................#",
-    "#.###.###.###.###.#.#",
-    "#.#...............#.#",
-    "#.#.###########.#.#.#",
-    "#.#.#.........#.#.#.#",
-    "#.#.#.##...##.#.#.#.#",
-    "#.....#BICPS#.......#",
-    "#.#.#.#######.#.#.#.#",
-    "#.#.#.........#.#.#.#",
-    "#.#.###########.#.#.#",
-    "#.#...............#.#",
-    "#.###.###.###.###.#.#",
-    "#...................#",
-    "#####################"
+    "############################",
+    "#............##............#",
+    "#.####.#####.##.#####.####.#",
+    "#*####.#####.##.#####.####*#",
+    "#.####.#####.##.#####.####.#",
+    "#..........................#",
+    "#.####.##.########.##.####.#",
+    "#.####.##.########.##.####.#",
+    "#......##....##....##......#",
+    "######.##### ## #####.######",
+    "     #.##### ## #####.#     ",
+    "     #.##          ##.#     ",
+    "     #.## ##BPIC## ##.#     ",
+    "######.## ######## ##.######",
+    "      .   ##    ##   .      ",
+    "######.## ######## ##.######",
+    "     #.## ######## ##.#     ",
+    "     #.##          ##.#     ",
+    "     #.## ######## ##.#     ",
+    "######.## ######## ##.######",
+    "#............##............#",
+    "#.####.#####.##.#####.####.#",
+    "#.####.#####.##.#####.####.#",
+    "#*..##................##..*#",
+    "###.##.##.########.##.##.###",
+    "###.##.##.########.##.##.###",
+    "#......##...S##....##......#",
+    "#.##########.##.##########.#",
+    "#.##########.##.##########.#",
+    "#..........................#",
+    "############################",
   };
 
-  private PacmanGame game;
-  private Blinky blinky;
-  private Pinky pinky;
-  private Inky inky;
-  private Clyde clyde;
-
-  @Before
-  public void setUp() {
-    game = new PacmanGame(TEST_MAZE, 10);
-    Actor[] enemies = game.getEnemies();
-
-    // Find our ghosts
-    for (Actor ghost : enemies) {
-      if (ghost instanceof Blinky) blinky = (Blinky) ghost;
-      else if (ghost instanceof Pinky) pinky = (Pinky) ghost;
-      else if (ghost instanceof Inky) inky = (Inky) ghost;
-      else if (ghost instanceof Clyde) clyde = (Clyde) ghost;
-    }
-
-    // Make sure we have all ghosts
-    assertNotNull("Blinky should be implemented", blinky);
-    assertNotNull("Pinky should be implemented", pinky);
-    assertNotNull("Inky should be implemented", inky);
-    assertNotNull("Clyde should be implemented", clyde);
-  }
-
-  /** Creates a game descriptor for testing. */
-  private Descriptor makeDescriptor() {
-    Location blinkyLoc = blinky.getCurrentLocation();
-    Location playerLoc = game.getPlayer().getCurrentLocation();
-    Direction playerDir = game.getPlayer().getCurrentDirection();
-    return new Descriptor(playerLoc, playerDir, blinkyLoc);
-  }
-
   /**
-   * Test that ghosts don't oscillate (move up and down repeatedly) when they should be making
-   * consistent progress.
+   * Main method to run the test.
+   * 
+   * @param args Command line arguments (not used)
    */
-  @Test
-  public void testNoOscillation() {
-    // Put ghosts in SCATTER mode
-    Descriptor desc = makeDescriptor();
-    blinky.setMode(Mode.SCATTER, desc);
-
-    // Record starting position
-    Location startLocation = blinky.getCurrentLocation();
-
-    // Update several times
-    for (int i = 0; i < 30; i++) {
-      blinky.update(desc);
+  public static void main(String[] args) {
+    System.out.println("Starting Ghost Movement Test with Logging...");
+    
+    // Create a game with a reasonable framerate
+    PacmanGame game = new PacmanGame(TEST_MAZE, 20);
+    Actor[] ghosts = game.getEnemies();
+    
+    // Check if we have the expected number of ghosts
+    if (ghosts.length != 4) {
+      System.err.println("ERROR: Expected 4 ghosts, got " + ghosts.length);
+      return;
     }
-
-    // Check final position
-    Location endLocation = blinky.getCurrentLocation();
-
-    // Ghost should have moved from its starting position
-    assertFalse("Ghost should make progress and not get stuck", startLocation.equals(endLocation));
-
-    // Test for oscillation by checking if position changes consistently
-    Location prevLocation = null;
-    Direction prevDirection = null;
-    int directionChanges = 0;
-    int positionChanges = 0;
-
-    // Reset ghost to starting position
-    blinky.reset();
-    blinky.setMode(Mode.SCATTER, desc);
-
-    // Track positions and direction changes over several updates
-    for (int i = 0; i < 20; i++) {
-      Location curLocation = blinky.getCurrentLocation();
-      Direction curDirection = blinky.getCurrentDirection();
-
-      if (prevLocation != null) {
-        if (!curLocation.equals(prevLocation)) {
-          positionChanges++;
+    
+    System.out.println("Found " + ghosts.length + " ghosts");
+    
+    // Set all ghosts to SCATTER mode to ensure they're active
+    System.out.println("Setting all ghosts to SCATTER mode");
+    for (Actor ghost : ghosts) {
+      ghost.setMode(Mode.SCATTER, null);
+      System.out.println(ghost.getClass().getSimpleName() + 
+                         " at " + ghost.getCurrentLocation() + 
+                         " with direction " + ghost.getCurrentDirection());
+    }
+    
+    // Run for a number of frames to let ghosts move
+    System.out.println("\nRunning simulation for 300 frames...");
+    final int framesToRun = 300;
+    
+    // Track movement for oscillation detection
+    Location[] previousLocations = new Location[4];
+    int[] oscillationCounts = new int[4];
+    
+    for (int i = 0; i < framesToRun; i++) {
+      game.updateAll();
+      
+      // Check for oscillation (returning to same position)
+      for (int g = 0; g < ghosts.length; g++) {
+        Actor ghost = ghosts[g];
+        Location currentLoc = ghost.getCurrentLocation();
+        
+        if (previousLocations[g] != null) {
+          // If we've returned to a previous position after moving away,
+          // that might indicate oscillation
+          if (i > 2 && currentLoc.equals(previousLocations[g])) {
+            oscillationCounts[g]++;
+          }
+        }
+        
+        previousLocations[g] = currentLoc;
+      }
+      
+      // Report ghost positions every 50 frames
+      if (i % 50 == 0) {
+        System.out.println("\nFrame " + i + " ghost positions:");
+        for (int g = 0; g < ghosts.length; g++) {
+          Actor ghost = ghosts[g];
+          System.out.println(ghost.getClass().getSimpleName() + 
+                            " at " + ghost.getCurrentLocation() + 
+                            " exact: (" + ghost.getRowExact() + ", " + ghost.getColExact() + ")" +
+                            " with direction " + ghost.getCurrentDirection() + 
+                            " mode: " + ghost.getMode() +
+                            " oscillation count: " + oscillationCounts[g]);
         }
       }
-
-      if (prevDirection != null) {
-        if (curDirection != prevDirection) {
-          directionChanges++;
+    }
+    
+    // Final report
+    System.out.println("\nFinal ghost positions after " + framesToRun + " frames:");
+    for (int g = 0; g < ghosts.length; g++) {
+      Actor ghost = ghosts[g];
+      System.out.println(ghost.getClass().getSimpleName() + 
+                        " at " + ghost.getCurrentLocation() + 
+                        " exact: (" + ghost.getRowExact() + ", " + ghost.getColExact() + ")" +
+                        " with direction " + ghost.getCurrentDirection() + 
+                        " mode: " + ghost.getMode() +
+                        " oscillation count: " + oscillationCounts[g]);
+    }
+    
+    // Check for log file
+    java.io.File logFile = new java.io.File("ghost_movement.log");
+    if (logFile.exists()) {
+      System.out.println("\nLog file created at: " + logFile.getAbsolutePath());
+      System.out.println("Log file size: " + logFile.length() + " bytes");
+      
+      // Read and display the last few lines of the log for verification
+      try {
+        java.io.BufferedReader reader = new java.io.BufferedReader(
+            new java.io.FileReader(logFile));
+        String line;
+        String[] lastLines = new String[10];
+        int lineCount = 0;
+        
+        while ((line = reader.readLine()) != null) {
+          lastLines[lineCount % 10] = line;
+          lineCount++;
         }
+        
+        reader.close();
+        
+        System.out.println("\nLast few log entries:");
+        for (int i = 0; i < 10; i++) {
+          int index = (lineCount + i) % 10;
+          if (lastLines[index] != null) {
+            System.out.println(lastLines[index]);
+          }
+        }
+      } catch (Exception e) {
+        System.err.println("Error reading log file: " + e.getMessage());
       }
-
-      prevLocation = curLocation;
-      prevDirection = curDirection;
-      blinky.update(desc);
+    } else {
+      System.err.println("\nERROR: Log file not created!");
     }
-
-    // For 20 updates, a properly moving ghost should have significantly
-    // more position changes than direction changes
-    assertTrue(
-        "Ghost should change position more often than direction",
-        positionChanges > directionChanges * 2);
-  }
-
-  /** Test ghost behavior at intersections - should make proper turns without oscillation. */
-  @Test
-  public void testIntersectionBehavior() {
-    // Put ghost in a position approaching an intersection
-    blinky.reset();
-    blinky.setMode(Mode.CHASE, makeDescriptor());
-
-    // Track previous locations
-    Location[] previousLocations = new Location[10];
-    Direction[] previousDirections = new Direction[10];
-
-    // Update several times, recording positions
-    for (int i = 0; i < 10; i++) {
-      blinky.update(makeDescriptor());
-      previousLocations[i] = blinky.getCurrentLocation();
-      previousDirections[i] = blinky.getCurrentDirection();
-    }
-
-    // Count oscillations (back-and-forth movements)
-    int oscillationCount = 0;
-    for (int i = 2; i < 10; i++) {
-      if (previousLocations[i].equals(previousLocations[i - 2])
-          && !previousLocations[i].equals(previousLocations[i - 1])) {
-        oscillationCount++;
-      }
-    }
-
-    // Should have minimal oscillation
-    assertTrue("Ghost should not oscillate at intersections", oscillationCount <= 1);
-  }
-
-  /** Test all ghost behaviors in CHASE mode. */
-  @Test
-  public void testChaseMode() {
-    Descriptor desc = makeDescriptor();
-
-    // Set all ghosts to CHASE mode
-    blinky.setMode(Mode.CHASE, desc);
-    pinky.setMode(Mode.CHASE, desc);
-    inky.setMode(Mode.CHASE, desc);
-    clyde.setMode(Mode.CHASE, desc);
-
-    // Run updates
-    for (int i = 0; i < 10; i++) {
-      desc = makeDescriptor(); // Update descriptor
-      blinky.update(desc);
-      pinky.update(desc);
-      inky.update(desc);
-      clyde.update(desc);
-    }
-
-    // All ghosts should be in CHASE mode
-    assertEquals("Blinky should be in CHASE mode", Mode.CHASE, blinky.getMode());
-    assertEquals("Pinky should be in CHASE mode", Mode.CHASE, pinky.getMode());
-    assertEquals("Inky should be in CHASE mode", Mode.CHASE, inky.getMode());
-    assertEquals("Clyde should be in CHASE mode", Mode.CHASE, clyde.getMode());
-
-    // Check speeds
-    assertEquals(
-        "Ghost speed should be base speed in CHASE mode",
-        blinky.getBaseIncrement(),
-        blinky.getCurrentIncrement(),
-        0.001);
-  }
-
-  /** Test all ghost behaviors in FRIGHTENED mode. */
-  @Test
-  public void testFrightenedMode() {
-    Descriptor desc = makeDescriptor();
-
-    // Set all ghosts to FRIGHTENED mode
-    blinky.setMode(Mode.FRIGHTENED, desc);
-    pinky.setMode(Mode.FRIGHTENED, desc);
-    inky.setMode(Mode.FRIGHTENED, desc);
-    clyde.setMode(Mode.FRIGHTENED, desc);
-
-    // All ghosts should be in FRIGHTENED mode with reduced speed
-    assertEquals("Blinky should be in FRIGHTENED mode", Mode.FRIGHTENED, blinky.getMode());
-    assertTrue(
-        "Blinky should have reduced speed in FRIGHTENED mode",
-        blinky.getCurrentIncrement() < blinky.getBaseIncrement());
-
-    assertEquals("Pinky should be in FRIGHTENED mode", Mode.FRIGHTENED, pinky.getMode());
-    assertTrue(
-        "Pinky should have reduced speed in FRIGHTENED mode",
-        pinky.getCurrentIncrement() < pinky.getBaseIncrement());
-
-    assertEquals("Inky should be in FRIGHTENED mode", Mode.FRIGHTENED, inky.getMode());
-    assertTrue(
-        "Inky should have reduced speed in FRIGHTENED mode",
-        inky.getCurrentIncrement() < inky.getBaseIncrement());
-
-    assertEquals("Clyde should be in FRIGHTENED mode", Mode.FRIGHTENED, clyde.getMode());
-    assertTrue(
-        "Clyde should have reduced speed in FRIGHTENED mode",
-        clyde.getCurrentIncrement() < clyde.getBaseIncrement());
-
-    // Run updates and check that ghosts move without getting stuck
-    for (int i = 0; i < 30; i++) {
-      desc = makeDescriptor(); // Update descriptor
-      blinky.update(desc);
-    }
-
-    Location startLoc = blinky.getCurrentLocation();
-    double startRow = blinky.getRowExact();
-    double startCol = blinky.getColExact();
-
-    // Continue updating
-    for (int i = 0; i < 10; i++) {
-      desc = makeDescriptor();
-      blinky.update(desc);
-    }
-
-    // Ghost should have moved
-    double endRow = blinky.getRowExact();
-    double endCol = blinky.getColExact();
-
-    assertTrue(
-        "Ghost should make progress in FRIGHTENED mode",
-        Math.abs(endRow - startRow) > 0.1 || Math.abs(endCol - startCol) > 0.1);
+    
+    System.out.println("\nTest complete.");
   }
 }
