@@ -57,7 +57,7 @@ public class RunGame {
   };
 
   public static void main(String[] args) {
-    final PacmanGame maze = new PacmanGame(TEST1, 50);
+    final PacmanGame maze = new PacmanGame(MAIN1, 50);
     Runnable r =
         new Runnable() {
           public void run() {

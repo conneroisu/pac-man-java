@@ -15,14 +15,13 @@ import static api.Mode.INACTIVE;
 import static api.Mode.SCATTER;
 
 import hw4.Blinky;
-// import hw4.Clyde;
-// import hw4.Inky;
+import hw4.Clyde;
+import hw4.Inky;
 import hw4.Pacman;
+import hw4.Pinky;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
-
-// import hw4.Pinky;
 
 /** State and logic for a Pacman game. */
 public class PacmanGame {
@@ -164,33 +163,33 @@ public class PacmanGame {
             enemyList.add(0, a);
             colorList.add(0, Color.RED);
           }
-          //            else if (c == 'P')
-          //            {
-          //              Location home = new Location(row, col);
-          //              Direction dir = findInitialDirection(row, col);
-          //              Location scatterTarget = new Location(-3, 2);
-          //              Actor a = new Pinky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
-          //              enemyList.add(a);
-          //              colorList.add(Color.PINK);
-          //            }
-          //            else if (c == 'I')
-          //            {
-          //              Location home = new Location(row, col);
-          //              Direction dir = findInitialDirection(row, col);
-          //              Location scatterTarget = new Location(height + 1, width - 1);
-          //              Actor a = new Inky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
-          //              enemyList.add(a);
-          //              colorList.add(Color.CYAN);
-          //            }
-          //            else if (c == 'C')
-          //            {
-          //              Location home = new Location(row, col);
-          //              Direction dir = findInitialDirection(row, col);
-          //              Location scatterTarget = new Location(height + 1, 0);
-          //              Actor a = new Clyde(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
-          //              enemyList.add(a);
-          //              colorList.add(Color.ORANGE);
-          //            }
+          else if (c == 'P')
+          {
+            Location home = new Location(row, col);
+            Direction dir = findInitialDirection(row, col);
+            Location scatterTarget = new Location(-3, 2);
+            Actor a = new Pinky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
+            enemyList.add(a);
+            colorList.add(Color.PINK);
+          }
+          else if (c == 'I')
+          {
+            Location home = new Location(row, col);
+            Direction dir = findInitialDirection(row, col);
+            Location scatterTarget = new Location(height + 1, width - 1);
+            Actor a = new Inky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
+            enemyList.add(a);
+            colorList.add(Color.CYAN);
+          }
+          else if (c == 'C')
+          {
+            Location home = new Location(row, col);
+            Direction dir = findInitialDirection(row, col);
+            Location scatterTarget = new Location(height + 1, 0);
+            Actor a = new Clyde(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
+            enemyList.add(a);
+            colorList.add(Color.ORANGE);
+          }
         }
       }
     }

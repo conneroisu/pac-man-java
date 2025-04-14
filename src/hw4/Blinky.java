@@ -27,19 +27,19 @@ public class Blinky extends ActorImpl {
     } else if (super.getMode() == Mode.FRIGHTENED) {
       // select a random location within the bounds of the play area
       Location randomLocation = null;
-      int randomX = -1;
-      int randomY = -1;
-      while (randomLocation == null || maze.isWall(randomX, randomY)) {
+      int randomRow = -1;
+      int randomCol = -1;
+      while (randomLocation == null || maze.isWall(randomRow, randomCol)) {
         // get the width and height of the maze
         int width = maze.getNumColumns();
         int height = maze.getNumRows();
         // generate a random number between 0 and width of the maze
-        randomX = rand.nextInt(width);
+        randomCol = rand.nextInt(width);
         // generate a random number between 0 and height of the maze
-        randomY = rand.nextInt(height);
+        randomRow = rand.nextInt(height);
       }
       // create a new location with the random numbers
-      randomLocation = new Location(randomX, randomY);
+      randomLocation = new Location(randomRow, randomCol);
       // return the location
       return randomLocation;
     } else if (super.getMode() == Mode.INACTIVE) {
