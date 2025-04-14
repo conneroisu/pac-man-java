@@ -8,8 +8,6 @@ import api.Location;
 import api.PacmanGame;
 import com.pacman.ghost.Blinky;
 
-/** Some ideas for initially testing the update() method. */
-
 // NOTE: The tests below assume that you have a bogus, temporary implementation
 // calculateNextCell in your Blinky class, like this:
 //
@@ -44,7 +42,14 @@ public final class SimpleTest {
 
   /** Test maze with simple layout. */
   public static final String[] SIMPLE1 = {
-    "#######", "#.....#", "#.....#", "#.....#", "#.....#", "#..B..#", "#S....#", "#######",
+    "#######", 
+    "#.....#", 
+    "#.....#", 
+    "#.....#", 
+    "#.....#", 
+    "#..B..#", 
+    "#S....#", 
+    "#######"
   };
 
   /**

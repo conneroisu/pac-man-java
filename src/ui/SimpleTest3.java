@@ -5,7 +5,6 @@ import api.Mode;
 import api.PacmanGame;
 import com.pacman.ghost.Blinky;
 
-/** More ideas for testing the calculateNextCell() method. */
 /**
  * More complete test for Blinky behavior with different modes.
  */

@@ -22,7 +22,7 @@ public abstract class ActorImpl implements Actor {
   private static final double ERR = 0.001;
   
   /** Number of frames to consider "stuck". */
-  private static final int STUCK_THRESHOLD = 10;
+  private static final int STUCK_THRESHOLD = 5;
   
   /** Base speed increment. */
   private double baseIncrement;
@@ -166,6 +166,16 @@ public abstract class ActorImpl implements Actor {
         newRow = row - 1;
         currentDirection = Direction.UP;
         return new Location(newRow, col);
+      // If up is blocked or we're already at the top of ghost house area,
+      // try left or right to move out of the house
+      } else if (col > 0 && !maze.isWall(row, col - 1)) {
+        newCol = col - 1;
+        currentDirection = Direction.LEFT;
+        return new Location(row, newCol);
+      } else if (col < numCols - 1 && !maze.isWall(row, col + 1)) {
+        newCol = col + 1;
+        currentDirection = Direction.RIGHT;
+        return new Location(row, newCol);
       }
     }
 
@@ -810,12 +820,62 @@ public abstract class ActorImpl implements Actor {
         // Force ghost to choose a new direction (anything except the current one)
         Direction[] directions = {Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT};
         Direction originalDirection = currentDirection;
+        
+        // Shuffle the directions array to introduce randomness
+        for (int i = 0; i < directions.length; i++) {
+          int j = rand.nextInt(directions.length);
+          Direction temp = directions[i];
+          directions[i] = directions[j];
+          directions[j] = temp;
+        }
 
-        // Try to find a valid direction that isn't the current one
+        // First try directions that aren't opposite to current, to avoid ping-ponging
         for (Direction dir : directions) {
-          if (dir != originalDirection) {
-            boolean canMove = false;
+          // Skip opposite direction as the first choice
+          if ((dir == Direction.UP && originalDirection == Direction.DOWN) ||
+              (dir == Direction.DOWN && originalDirection == Direction.UP) ||
+              (dir == Direction.LEFT && originalDirection == Direction.RIGHT) ||
+              (dir == Direction.RIGHT && originalDirection == Direction.LEFT)) {
+            continue;
+          }
+          
+          boolean canMove = false;
+          switch (dir) {
+            case UP:
+              canMove = currentRow > 0 && !maze.isWall(currentRow - 1, currentCol);
+              break;
+            case DOWN:
+              canMove = currentRow < numRows - 1 && !maze.isWall(currentRow + 1, currentCol);
+              break;
+            case LEFT:
+              canMove = currentCol > 0 && !maze.isWall(currentRow, currentCol - 1);
+              break;
+            case RIGHT:
+              canMove = currentCol < numCols - 1 && !maze.isWall(currentRow, currentCol + 1);
+              break;
+            default:
+              // No action needed for default case
+              break;
+          }
 
+          if (canMove) {
+            // Force new direction
+            currentDirection = dir;
+
+            // Reset stuck counter and pastCenter flag
+            stuckFrameCount = 0;
+            pastCenter = false;
+
+            // Recalculate next cell with new direction
+            calculateNextCell(description);
+            break;
+          }
+        }
+        
+        // If we couldn't find a non-opposite direction, try any direction including opposite
+        if (stuckFrameCount >= STUCK_THRESHOLD) {
+          for (Direction dir : directions) {
+            boolean canMove = false;
             switch (dir) {
               case UP:
                 canMove = currentRow > 0 && !maze.isWall(currentRow - 1, currentCol);
@@ -1012,23 +1072,48 @@ public abstract class ActorImpl implements Actor {
 
       // Make the change if it's valid
       if (canChangeDirection) {
-        // Check if this would cause an oscillation (turning back to previous direction)
-        // This fixes the up/down or left/right oscillation issue
+        // In maze intersections or when exiting the ghost house,
+        // we should always allow direction changes even if they seem like oscillations
+        // Only apply oscillation prevention in corridors
+        boolean isInCorridor = false;
         boolean wouldOscillate = false;
         
-        final int oscillationThreshold = 3;
-
-        // Opposite directions check
-        if ((currentDirection == Direction.UP && nextDirection == Direction.DOWN)
-            || (currentDirection == Direction.DOWN && nextDirection == Direction.UP)
-            || (currentDirection == Direction.LEFT && nextDirection == Direction.RIGHT)
-            || (currentDirection == Direction.RIGHT && nextDirection == Direction.LEFT)) {
-          // Only consider it oscillation if we just changed direction recently
-          if (stuckFrameCount < oscillationThreshold) {
-            wouldOscillate = true;
+        // Count available directions to determine if we're in a corridor
+        int availableDirections = 0;
+        if (newLocation.row() > 0 && !maze.isWall(newLocation.row() - 1, newLocation.col())) {
+          availableDirections++;
+        }
+        if (newLocation.row() < maze.getNumRows() - 1 && 
+            !maze.isWall(newLocation.row() + 1, newLocation.col())) {
+          availableDirections++;
+        }
+        if (newLocation.col() > 0 && !maze.isWall(newLocation.row(), newLocation.col() - 1)) {
+          availableDirections++;
+        }
+        if (newLocation.col() < maze.getNumColumns() - 1 && 
+            !maze.isWall(newLocation.row(), newLocation.col() + 1)) {
+          availableDirections++;
+        }
+        
+        // If we only have 2 directions available (forward and backward), we're in a corridor
+        isInCorridor = (availableDirections <= 2);
+        
+        // Check for oscillation only if we're in a corridor
+        if (isInCorridor) {
+          final int oscillationThreshold = 3;
+          
+          // Opposite directions check
+          if ((currentDirection == Direction.UP && nextDirection == Direction.DOWN)
+              || (currentDirection == Direction.DOWN && nextDirection == Direction.UP)
+              || (currentDirection == Direction.LEFT && nextDirection == Direction.RIGHT)
+              || (currentDirection == Direction.RIGHT && nextDirection == Direction.LEFT)) {
+            // Only consider it oscillation if we just changed direction recently
+            if (stuckFrameCount < oscillationThreshold) {
+              wouldOscillate = true;
+            }
           }
         }
-
+        
         if (!wouldOscillate) {
           currentDirection = nextDirection;
           pastCenter = false;

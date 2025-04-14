@@ -23,7 +23,7 @@ public final class Clyde extends ActorImpl {
 
   /** Maximum number of attempts to find a random location. */
   private static final int MAX_ATTEMPTS = 20;
-  
+
   /**
    * Constructor for Clyde ghost.
    *

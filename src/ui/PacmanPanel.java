@@ -21,7 +21,7 @@ import javax.swing.Timer;
  * game, b) send turn instructions to the game when one of the arrow keys is pressed, and c) draw
  * the game state
  */
-public class PacmanPanel extends JPanel {
+public final class PacmanPanel extends JPanel {
   /** Size in pixels of the cells for the grid. */
   public static final int CELL_SIZE = 30;
 
@@ -36,6 +36,51 @@ public class PacmanPanel extends JPanel {
 
   /** Pale green to draw grid, if desired. */
   public static final Color GRID_COLOR = new Color(0, 150, 0);
+  
+  /** Angle in degrees for direction LEFT. */
+  private static final int LEFT_ANGLE = 180;
+  
+  /** Angle in degrees for direction RIGHT. */
+  private static final int RIGHT_ANGLE = 0;
+
+  /** Angle in degrees for direction UP. */
+  private static final int UP_ANGLE = 90;
+  
+  /** Angle in degrees for direction DOWN. */
+  private static final int DOWN_ANGLE = 270;
+  
+  /** Full circle in degrees. */
+  private static final int FULL_CIRCLE = 360;
+  
+  /** Pacman mouth open angle. */
+  private static final int MOUTH_OPEN_ANGLE = 50;
+  
+  /** Milliseconds in a second. */
+  private static final int MILLISECONDS_PER_SECOND = 1000;
+  
+  /** Offset factor for centering. */
+  private static final double CENTER_OFFSET = 0.5;
+  
+  /** Quarter second count for ghost flashing. */
+  private static final int QUARTER_SECOND = 250;
+  
+  /** Value for alternating flash pattern. */
+  private static final int FLASH_CYCLES = 16;
+  
+  /** Eye size as fraction of cell size. */
+  private static final int EYE_SIZE_FACTOR = 4;
+  
+  /** Eye separation factor. */
+  private static final int EYE_SEPARATION_FACTOR = 2;
+  
+  /** Vertical offset for eyes. */
+  private static final int EYE_VERTICAL_OFFSET_FACTOR = 10;
+  
+  /** Eyeball movement factor. */
+  private static final int EYEBALL_MOVEMENT_FACTOR = 4;
+  
+  /** Half size factor. */
+  private static final int HALF = 2;
 
   /** The grid to be displayed by this panel. */
   private PacmanGame game;
@@ -46,27 +91,36 @@ public class PacmanPanel extends JPanel {
   /** Timer interval, determined by game's preferred frame rate. */
   private int interval;
 
+  /** Previous location of the player, used for animation. */
   private Location prev;
+  
+  /** Current angle for Pacman's mouth animation. */
   private double angle;
+  
+  /** Increment for changing the angle in Pacman's mouth animation. */
   private double arcIncrement;
 
   /**
    * Constructs a panel to display the given game.
    *
    * @param game the grid to be displayed
-   * @param sleepTime time between frames, in milliseconds
    */
-  public PacmanPanel(PacmanGame game) {
+  public PacmanPanel(final PacmanGame game) {
     this.game = game;
     prev = game.getPlayer().getCurrentLocation();
-    interval = 1000 / game.getFrameRate();
+    interval = MILLISECONDS_PER_SECOND / game.getFrameRate();
     timer = new Timer(interval, new TimerCallback());
     timer.start();
     this.addKeyListener(new MyKeyListener());
   }
 
+  /**
+   * Paints the game panel, including walls, dots, energizers, Pacman, and ghosts.
+   *
+   * @param g the graphics context to use for painting
+   */
   @Override
-  public void paintComponent(Graphics g) {
+  public void paintComponent(final Graphics g) {
     // clear background
     g.clearRect(0, 0, getWidth(), getHeight());
 
@@ -108,40 +162,53 @@ public class PacmanPanel extends JPanel {
     drawGhosts(g);
   }
 
-  private void drawPacman(Graphics g) {
+  /**
+   * Draws Pacman with mouth animation based on the current direction and animation state.
+   *
+   * @param g the graphics context to use for painting
+   */
+  private void drawPacman(final Graphics g) {
     // upper left corner
     Actor pacman = game.getPlayer();
     Direction dir = pacman.getCurrentDirection();
 
-    int dirDegrees = 0;
+    int dirDegrees = RIGHT_ANGLE;
     switch (dir) {
       case LEFT:
-        dirDegrees = 180;
+        dirDegrees = LEFT_ANGLE;
         break;
       case RIGHT:
-        dirDegrees = 0;
+        dirDegrees = RIGHT_ANGLE;
         break;
       case UP:
-        dirDegrees = 90;
+        dirDegrees = UP_ANGLE;
         break;
       case DOWN:
-        dirDegrees = 270;
+        dirDegrees = DOWN_ANGLE;
+        break;
+      default:
+        // No action needed, using RIGHT_ANGLE as default
     }
 
     int currAngle = (int) Math.round(angle);
     int start = dirDegrees + currAngle;
-    int sweep = 360 - currAngle * 2;
+    int sweep = FULL_CIRCLE - currAngle * 2;
 
-    double pmRow = pacman.getRowExact() - 0.5;
+    double pmRow = pacman.getRowExact() - CENTER_OFFSET;
     int rowPixel = (int) Math.round(pmRow * CELL_SIZE);
-    double pmCol = pacman.getColExact() - 0.5;
+    double pmCol = pacman.getColExact() - CENTER_OFFSET;
     int colPixel = (int) Math.round(pmCol * CELL_SIZE);
     g.setColor(Color.YELLOW);
     // g.fillOval(colPixel, rowPixel, CELL_SIZE, CELL_SIZE);
     g.fillArc(colPixel, rowPixel, CELL_SIZE, CELL_SIZE, start, sweep);
   }
 
-  private void drawGhosts(Graphics g) {
+  /**
+   * Draws all ghosts with appropriate colors and animations based on their modes.
+   *
+   * @param g the graphics context to use for painting
+   */
+  private void drawGhosts(final Graphics g) {
     Actor[] enemies = game.getEnemies();
     Color[] colorHints = game.getColorHints();
     for (int i = 0; i < enemies.length; ++i) {
@@ -151,8 +218,8 @@ public class PacmanPanel extends JPanel {
 
         // flash every QUARTER second = 8 flashes in last 4 seconds
         int count = game.getFrightenedCount();
-        int quarterSecondCount = 250 / interval;
-        if (quarterSecondCount * 16 >= count) {
+        int quarterSecondCount = QUARTER_SECOND / interval;
+        if (quarterSecondCount * FLASH_CYCLES >= count) {
           int flag = count / quarterSecondCount;
           if (flag % 2 == 1) {
             g.setColor(Color.WHITE);
@@ -164,26 +231,26 @@ public class PacmanPanel extends JPanel {
         g.setColor(colorHints[i]);
       }
 
-      double pmRow = ghost.getRowExact() - 0.5;
+      double pmRow = ghost.getRowExact() - CENTER_OFFSET;
       int rowPixel = (int) Math.round(pmRow * CELL_SIZE);
-      double pmCol = ghost.getColExact() - 0.5;
+      double pmCol = ghost.getColExact() - CENTER_OFFSET;
       int colPixel = (int) Math.round(pmCol * CELL_SIZE);
       g.fillOval(colPixel, rowPixel, CELL_SIZE, CELL_SIZE);
-      g.fillRect(colPixel, rowPixel + CELL_SIZE / 2, CELL_SIZE, CELL_SIZE / 2);
+      g.fillRect(colPixel, rowPixel + CELL_SIZE / HALF, CELL_SIZE, CELL_SIZE / HALF);
 
-      int eyeSize = CELL_SIZE / 4;
-      int eyeSep = eyeSize / 2 + 1;
-      int left = CELL_SIZE / 2 - eyeSep - eyeSize / 2;
-      int right = CELL_SIZE / 2 + eyeSep - eyeSize / 2;
-      int vertOffset = CELL_SIZE / 10;
+      int eyeSize = CELL_SIZE / EYE_SIZE_FACTOR;
+      int eyeSep = eyeSize / EYE_SEPARATION_FACTOR + 1;
+      int left = CELL_SIZE / HALF - eyeSep - eyeSize / HALF;
+      int right = CELL_SIZE / HALF + eyeSep - eyeSize / HALF;
+      int vertOffset = CELL_SIZE / EYE_VERTICAL_OFFSET_FACTOR;
       g.setColor(Color.WHITE);
 
       g.fillOval(colPixel + left, rowPixel + vertOffset, eyeSize, eyeSize + 1);
       g.fillOval(colPixel + right, rowPixel + vertOffset, eyeSize, eyeSize + 1);
 
-      int eyeballX = eyeSize / 2;
-      int eyeballY = eyeSize / 2;
-      int shift = eyeSize / 4;
+      int eyeballX = eyeSize / HALF;
+      int eyeballY = eyeSize / HALF;
+      int shift = eyeSize / EYEBALL_MOVEMENT_FACTOR;
       Direction dir = ghost.getCurrentDirection();
 
       switch (dir) {
@@ -198,23 +265,33 @@ public class PacmanPanel extends JPanel {
           break;
         case DOWN:
           eyeballY += shift + 1;
+          break;
+        default:
+          // No action needed
       }
 
-      int xPos = left + eyeballX - eyeSize / 4;
-      int yPos = vertOffset + eyeballY - eyeSize / 4;
+      int xPos = left + eyeballX - eyeSize / EYEBALL_MOVEMENT_FACTOR;
+      int yPos = vertOffset + eyeballY - eyeSize / EYEBALL_MOVEMENT_FACTOR;
 
       g.setColor(Color.BLACK);
 
-      g.fillOval(colPixel + xPos, rowPixel + yPos, eyeSize / 2, eyeSize / 2);
-      xPos = right + eyeballX - eyeSize / 4;
-      g.fillOval(colPixel + xPos, rowPixel + yPos, eyeSize / 2, eyeSize / 2);
+      g.fillOval(colPixel + xPos, rowPixel + yPos, eyeSize / HALF, eyeSize / HALF);
+      xPos = right + eyeballX - eyeSize / EYEBALL_MOVEMENT_FACTOR;
+      g.fillOval(colPixel + xPos, rowPixel + yPos, eyeSize / HALF, eyeSize / HALF);
     }
   }
 
+  /**
+   * Listens for keyboard input to control Pacman's direction.
+   */
   private class MyKeyListener implements KeyListener {
+    /**
+     * Handles key press events to change Pacman's direction.
+     *
+     * @param event the key event to be processed
+     */
     @Override
-    public void keyPressed(KeyEvent event) {
-      // System.out.println("key " + event);
+    public void keyPressed(final KeyEvent event) {
       int key = event.getKeyCode();
       Direction dir = null;
       switch (key) {
@@ -237,20 +314,44 @@ public class PacmanPanel extends JPanel {
       game.turnPlayer(dir);
     }
 
+    /**
+     * Not used in this implementation.
+     *
+     * @param e the key event to be processed
+     */
     @Override
-    public void keyTyped(KeyEvent e) {
+    public void keyTyped(final KeyEvent e) {
       // do nothing
     }
 
+    /**
+     * Not used in this implementation.
+     *
+     * @param e the key event to be processed
+     */
     @Override
-    public void keyReleased(KeyEvent e) {
+    public void keyReleased(final KeyEvent e) {
       // do nothing
     }
   }
 
+  /**
+   * Timer callback for animation updates.
+   */
   private class TimerCallback implements ActionListener {
+    /** Full unit for speed calculations. */
+    private static final double FULL_UNIT = 1.0;
+    
+    /** Division factor for update count. */
+    private static final int UPDATE_DIVISION_FACTOR = 2;
+    
+    /**
+     * Handles timer events to update the game state and animations.
+     *
+     * @param e the event to be processed
+     */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(final ActionEvent e) {
       game.updateAll();
 
       // calculation for eating animation...
@@ -260,13 +361,13 @@ public class PacmanPanel extends JPanel {
         // transitioned to new cell, start closing pacman's mouth
         prev = curr;
         double currSpeed = pacman.getCurrentIncrement();
-        int numUpdates = (int) (1.0 / currSpeed / 2);
-        arcIncrement = -50 / numUpdates;
-        angle = 50 + arcIncrement;
+        int numUpdates = (int) (FULL_UNIT / currSpeed / UPDATE_DIVISION_FACTOR);
+        arcIncrement = -MOUTH_OPEN_ANGLE / numUpdates;
+        angle = MOUTH_OPEN_ANGLE + arcIncrement;
       } else if (angle <= 0) {
         arcIncrement = -arcIncrement;
         angle = arcIncrement;
-      } else if (angle < 50) {
+      } else if (angle < MOUTH_OPEN_ANGLE) {
         angle += arcIncrement;
       }
 

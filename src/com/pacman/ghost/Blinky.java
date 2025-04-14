@@ -14,7 +14,7 @@ import java.util.Random;
  * Strategy: Targets Pac-Man's exact location, making him the most direct pursuer
  */
 public final class Blinky extends ActorImpl {
-  
+
   /** Maximum number of attempts to find a random location. */
   private static final int MAX_ATTEMPTS = 20;
 
