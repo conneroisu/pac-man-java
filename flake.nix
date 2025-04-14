@@ -51,6 +51,54 @@
             '';
             description = "Compile and run the PacMan game";
           };
+          mvn-clean = {
+            exec = ''${pkgs.maven}/bin/mvn clean'';
+            description = "Maven clean";
+          };
+          mvn-compile = {
+            exec = ''${pkgs.maven}/bin/mvn compile'';
+            description = "Maven compile";
+          };
+          mvn-package = {
+            exec = ''${pkgs.maven}/bin/mvn package'';
+            description = "Maven package";
+          };
+          mvn-run = {
+            exec = ''${pkgs.maven}/bin/mvn exec:java'';
+            description = "Run with Maven";
+          };
+          mvn-test = {
+            exec = ''${pkgs.maven}/bin/mvn test'';
+            description = "Run all tests with Maven";
+          };
+          mvn-test-simple = {
+            exec = ''
+              cd $REPO_ROOT
+              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTest
+            '';
+            description = "Run SimpleTest";
+          };
+          mvn-test-simple1a = {
+            exec = ''
+              cd $REPO_ROOT
+              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTest1a
+            '';
+            description = "Run SimpleTest1a";
+          };
+          mvn-test-simple3 = {
+            exec = ''
+              cd $REPO_ROOT
+              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTest3
+            '';
+            description = "Run SimpleTest3";
+          };
+          mvn-test-frightened = {
+            exec = ''
+              cd $REPO_ROOT
+              ${pkgs.jdk23}/bin/java -cp target/classes ui.SimpleTestFrightened
+            '';
+            description = "Run SimpleTestFrightened";
+          };
         };
 
         # Convert scripts to packages
