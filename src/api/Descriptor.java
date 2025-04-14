@@ -20,7 +20,8 @@ public class Descriptor {
    * @param playerDirection the direction the player is facing
    * @param blinkyLocation the location of the 0th enemy
    */
-  public Descriptor(Location playerLocation, Direction playerDirection, Location blinkyLocation) {
+  public Descriptor(final Location playerLocation, final Direction playerDirection, 
+      final Location blinkyLocation) {
     this.playerLocation = playerLocation;
     this.playerDirection = playerDirection;
     this.blinkyLocation = blinkyLocation;

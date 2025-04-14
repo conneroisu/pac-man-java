@@ -1,21 +1,38 @@
 package ui;
 
-import static api.Mode.*;
+import api.Mode;
 
 import api.PacmanGame;
-import hw4.Blinky;
+import com.pacman.ghost.Blinky;
 
 /** More ideas for testing the calculateNextCell() method. */
-public class SimpleTest3 {
+/**
+ * More complete test for Blinky behavior with different modes.
+ */
+public final class SimpleTest3 {
+  
+  /**
+   * Private constructor to prevent instantiation of utility class.
+   */
+  private SimpleTest3() {
+    // Utility class should not be instantiated
+  }
   // one ghost
+  /** Simple test maze with one ghost. */
   public static final String[] SIMPLE3 = {
     "######", "#....#", "#.B..#", "#....#", "#S...#", "######",
   };
 
-  public static void main(String[] args) {
+  /**
+   * Main method to run the test.
+   * 
+   * @param args Command line arguments (not used)
+   */
+  public static void main(final String[] args) {
 
     // using a frame rate of 10, the speed increment will be 0.4
-    PacmanGame game = new PacmanGame(SIMPLE3, 10);
+    final int frameRate = 10;
+    PacmanGame game = new PacmanGame(SIMPLE3, frameRate);
 
     // Blinky is always at index 0 in the enemies array
     Blinky b = (Blinky) game.getEnemies()[0];
@@ -23,7 +40,7 @@ public class SimpleTest3 {
     // Blinky is at (2, 2) and his scatter target is
     // at -3, 3, so moving up to (1, 2) will minimize
     // the straight-line distance to the target
-    b.setMode(SCATTER, SimpleTest.makeDescriptor(game));
+    b.setMode(Mode.SCATTER, SimpleTest.makeDescriptor(game));
     System.out.println(b.getNextCell()); // expected (1, 2)
     System.out.println();
 
@@ -36,7 +53,7 @@ public class SimpleTest3 {
     // now, if we change the mode to CHASE, since we are already past the midpoint of
     // the current cell in direction UP, the implicit call to calculateNextCell
     // should not do anything
-    b.setMode(CHASE, SimpleTest.makeDescriptor(game));
+    b.setMode(Mode.CHASE, SimpleTest.makeDescriptor(game));
     System.out.println(b.getNextCell()); // still (1, 2)
     System.out.println(b.getCurrentDirection()); // still UP
     System.out.println(b.getRowExact() + ", " + b.getColExact()); // still 2.1, 2.5

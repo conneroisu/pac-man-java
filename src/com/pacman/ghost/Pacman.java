@@ -1,4 +1,4 @@
-package hw4;
+package com.pacman.ghost;
 
 import static api.Direction.DOWN;
 import static api.Direction.LEFT;
@@ -12,9 +12,13 @@ import api.Location;
 import api.MazeMap;
 import api.Mode;
 
-public class Pacman implements Actor {
+/**
+ * Implements the player-controlled Pac-Man character.
+ * Handles movement, turning, and wall collision detection.
+ */
+public final class Pacman implements Actor {
   /** Margin of error for comparing exact position to centerline of cell. */
-  public static final double ERR = 0.001;
+  private static final double ERR = 0.001;
 
   /** Maze configuration. */
   private MazeMap maze;
@@ -66,7 +70,8 @@ public class Pacman implements Actor {
    * @param baseSpeed base speed increment
    * @param homeDirection initial direction
    */
-  public Pacman(MazeMap maze, Location home, double baseSpeed, Direction homeDirection) {
+  public Pacman(final MazeMap maze, final Location home, final double baseSpeed, 
+      final Direction homeDirection) {
     this.maze = maze;
     this.home = home;
     this.baseIncrement = baseSpeed;
@@ -111,7 +116,7 @@ public class Pacman implements Actor {
 
   @Override
   public Mode getMode() {
-    // does nothing
+    // Pacman doesn't have modes like ghosts
     return null;
   }
 
@@ -131,22 +136,22 @@ public class Pacman implements Actor {
   }
 
   @Override
-  public void setColExact(double c) {
+  public void setColExact(final double c) {
     colExact = c;
   }
 
   @Override
-  public void setDirection(Direction dir) {
+  public void setDirection(final Direction dir) {
     currentDirection = dir;
   }
 
   @Override
-  public void setMode(Mode mode, Descriptor desc) {
-    // does nothing
+  public void setMode(final Mode mode, final Descriptor desc) {
+    // Pacman doesn't have modes like ghosts
   }
 
   @Override
-  public void setRowExact(double r) {
+  public void setRowExact(final double r) {
     rowExact = r;
   }
 
@@ -159,7 +164,7 @@ public class Pacman implements Actor {
    *
    * @param newDir desired direction of travel for the player
    */
-  public void tryTurn(Direction newDir) {
+  public void tryTurn(final Direction newDir) {
     if (turning) {
       // can't change direction in the middle of a turn
       return;
@@ -181,7 +186,7 @@ public class Pacman implements Actor {
     int rowNum = (int) getRowExact();
 
     // max distance before new row/column that we can start a turn
-    double tolerance = 1.0;
+    final double tolerance = 1.0;
 
     int newColNum = colNum;
     int newRowNum = rowNum;
@@ -257,7 +262,7 @@ public class Pacman implements Actor {
   }
 
   @Override
-  public void update(Descriptor d) {
+  public void update(final Descriptor d) {
 
     if (getCurrentDirection() == null) {
       return;
@@ -322,6 +327,9 @@ public class Pacman implements Actor {
         }
         curRowExact += increment;
         break;
+      default:
+        // No action needed for default case
+        break;
     }
 
     // finally, update instance vars
@@ -380,6 +388,8 @@ public class Pacman implements Actor {
   /**
    * Determines the difference between current position and center of current cell, in the direction
    * of travel.
+   * 
+   * @return Distance to the center of the current cell
    */
   private double distanceToCenter() {
     double colPos = getColExact();
@@ -393,7 +403,8 @@ public class Pacman implements Actor {
         return rowPos - ((int) rowPos) - 0.5;
       case DOWN:
         return 0.5 - (rowPos - ((int) rowPos));
+      default:
+        return 0;
     }
-    return 0;
   }
 }

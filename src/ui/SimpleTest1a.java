@@ -6,7 +6,7 @@ import api.Descriptor;
 import api.Direction;
 import api.Location;
 import api.PacmanGame;
-import hw4.Blinky;
+import com.pacman.ghost.Blinky;
 
 /** Some ideas for initially testing the update() method. */
 
@@ -14,13 +14,28 @@ import hw4.Blinky;
 // of calculateNextCell, this assumes you have calculateNextCell and
 // setMode working correctly
 
-public class SimpleTest1a {
+/**
+ * Simple test for Blinky behavior in different modes.
+ */
+public final class SimpleTest1a {
+  
+  /**
+   * Private constructor to prevent instantiation of utility class.
+   */
+  private SimpleTest1a() {
+    // Utility class should not be instantiated
+  }
 
   public static final String[] SIMPLE1a = {
     "#######", "#.....#", "#....S#", "#.....#", "#.....#", "#..B..#", "#.....#", "#######",
   };
 
-  public static void main(String[] args) {
+  /**
+   * Main method to run tests.
+   * 
+   * @param args Command line arguments (not used)
+   */
+  public static void main(final String[] args) {
     // using a frame rate of 10, the speed increment will be 0.4
     PacmanGame game = new PacmanGame(SIMPLE1a, 10);
 
@@ -106,7 +121,13 @@ public class SimpleTest1a {
     // Expected: should end up at 2.5, 4.7 with next cell (2, 5)
   }
 
-  public static Descriptor makeDescriptor(PacmanGame game) {
+  /**
+   * Creates a game descriptor for use in testing.
+   *
+   * @param game The game to create a descriptor for
+   * @return A new descriptor with player and enemy information
+   */
+  public static Descriptor makeDescriptor(final PacmanGame game) {
     Location enemyLoc = game.getEnemies()[0].getCurrentLocation();
     Location playerLoc = game.getPlayer().getCurrentLocation();
     Direction playerDir = game.getPlayer().getCurrentDirection();

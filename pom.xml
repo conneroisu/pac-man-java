@@ -12,10 +12,21 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <junit.version>4.13.2</junit.version>
     </properties>
+    
+    <dependencies>
+        <!-- JUnit for testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <testSourceDirectory>src</testSourceDirectory>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -57,6 +68,8 @@
                         <include>ui/SimpleTest1a.java</include>
                         <include>ui/SimpleTest3.java</include>
                         <include>ui/SimpleTestFrightened.java</include>
+                        <include>ui/GhostMovementTest.java</include>
+                        <include>ui/GhostBehaviorTest.java</include>
                     </includes>
                 </configuration>
             </plugin>

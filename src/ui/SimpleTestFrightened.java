@@ -6,16 +6,31 @@ import api.Descriptor;
 import api.Direction;
 import api.Location;
 import api.PacmanGame;
-import hw4.Blinky;
+import com.pacman.ghost.Blinky;
 
 /** Some ideas for initially testing FRIGHTENED mode */
-public class SimpleTestFrightened {
+/**
+ * Test class for ghost behavior in frightened mode.
+ */
+public final class SimpleTestFrightened {
+  
+  /**
+   * Private constructor to prevent instantiation of utility class.
+   */
+  private SimpleTestFrightened() {
+    // Utility class should not be instantiated
+  }
 
   public static final String[] SIMPLE_FRIGHTENED = {
     "######", "#.####", "#B..S#", "#....#", "#....#", "#....#", "######",
   };
 
-  public static void main(String[] args) {
+  /**
+   * Main method to run the test.
+   *
+   * @param args Command line arguments (not used)
+   */
+  public static void main(final String[] args) {
     // using a frame rate of 10, the speed increment will be 0.4
     PacmanGame game = new PacmanGame(SIMPLE_FRIGHTENED, 10);
 
@@ -103,7 +118,13 @@ public class SimpleTestFrightened {
     System.out.println();
   }
 
-  public static Descriptor makeDescriptor(PacmanGame game) {
+  /**
+   * Creates a game descriptor for use in testing.
+   *
+   * @param game The game to create a descriptor for
+   * @return A new descriptor with player and enemy information
+   */
+  public static Descriptor makeDescriptor(final PacmanGame game) {
     Location enemyLoc = game.getEnemies()[0].getCurrentLocation();
     Location playerLoc = game.getPlayer().getCurrentLocation();
     Direction playerDir = game.getPlayer().getCurrentDirection();

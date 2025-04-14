@@ -14,7 +14,7 @@ public class Location {
    * @param row given row
    * @param col given column
    */
-  public Location(int row, int col) {
+  public Location(final int row, final int col) {
     this.row = row;
     this.col = col;
   }
@@ -40,9 +40,11 @@ public class Location {
   /**
    * Determines whether this Location is equal to the given object.
    *
+   * @param obj the object to compare this location with
    * @return true if the given object is a Location with the same row and column
    */
-  public boolean equals(Object obj) {
+  @Override
+  public boolean equals(final Object obj) {
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
@@ -50,7 +52,22 @@ public class Location {
     return row == other.row && col == other.col;
   }
 
-  /** Returns a string representation of this object in the form (row, column). */
+  /**
+   * Returns a hash code value for this location.
+   * 
+   * @return a hash code value for this location
+   */
+  @Override
+  public int hashCode() {
+    return 31 * row + col;
+  }
+
+  /** 
+   * Returns a string representation of this object in the form (row, column).
+   *
+   * @return string representation of the location
+   */
+  @Override
   public String toString() {
     return "(" + row + ", " + col + ")";
   }

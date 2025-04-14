@@ -1,16 +1,18 @@
 package api;
 
-/** Provides a limited read-only view of the cell layout in a Pacman game. */
+/** 
+ * Provides a limited read-only view of the cell layout in a Pacman game.
+ */
 public class MazeMap {
-  /** The underlying game instance */
-  private PacmanGame game;
+  /** The underlying game instance. */
+  private final PacmanGame game;
 
   /**
    * Constructs a MazeMap from the given game.
    *
    * @param game given game instance
    */
-  public MazeMap(PacmanGame game) {
+  public MazeMap(final PacmanGame game) {
     this.game = game;
   }
 
@@ -21,7 +23,7 @@ public class MazeMap {
    * @param col given column
    * @return true if the given location is a wall cell
    */
-  public boolean isWall(int row, int col) {
+  public boolean isWall(final int row, final int col) {
     return game.getCell(row, col).isWall();
   }
 

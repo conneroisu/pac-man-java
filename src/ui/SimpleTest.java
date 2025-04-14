@@ -1,12 +1,12 @@
 package ui;
 
-import static api.Mode.*;
+// Ghost mode imports
 
 import api.Descriptor;
 import api.Direction;
 import api.Location;
 import api.PacmanGame;
-import hw4.Blinky;
+import com.pacman.ghost.Blinky;
 
 /** Some ideas for initially testing the update() method. */
 
@@ -30,15 +30,32 @@ import hw4.Blinky;
 // }
 //
 
-public class SimpleTest {
+/**
+ * Simple test class to verify Blinky movement.
+ */
+public final class SimpleTest {
+  
+  /**
+   * Private constructor to prevent instantiation of utility class.
+   */
+  private SimpleTest() {
+    // Utility class should not be instantiated
+  }
 
+  /** Test maze with simple layout. */
   public static final String[] SIMPLE1 = {
     "#######", "#.....#", "#.....#", "#.....#", "#.....#", "#..B..#", "#S....#", "#######",
   };
 
-  public static void main(String[] args) {
+  /**
+   * Main method to run the test.
+   * 
+   * @param args Command line arguments (not used)
+   */
+  public static void main(final String[] args) {
     // using a frame rate of 10, the speed increment will be 0.4
-    PacmanGame game = new PacmanGame(SIMPLE1, 10);
+    final int frameRate = 10;
+    PacmanGame game = new PacmanGame(SIMPLE1, frameRate);
 
     // Blinky is always at index 0 in the enemies array
     Blinky b = (Blinky) game.getEnemies()[0];
@@ -63,7 +80,8 @@ public class SimpleTest {
     System.out.println();
 
     // lots of updates!  See the pdf for expected output
-    for (int i = 0; i < 10; ++i) {
+    final int numUpdates = 10;
+    for (int i = 0; i < numUpdates; ++i) {
       b.update(makeDescriptor(game));
       System.out.println(b.getRowExact() + ", " + b.getColExact());
       System.out.println(b.getCurrentDirection());
@@ -71,7 +89,13 @@ public class SimpleTest {
     }
   }
 
-  public static Descriptor makeDescriptor(PacmanGame game) {
+  /**
+   * Creates a game descriptor for use in testing.
+   *
+   * @param game The game to create a descriptor for
+   * @return A new descriptor with player and enemy information
+   */
+  public static Descriptor makeDescriptor(final PacmanGame game) {
     Location enemyLoc = game.getEnemies()[0].getCurrentLocation();
     Location playerLoc = game.getPlayer().getCurrentLocation();
     Direction playerDir = game.getPlayer().getCurrentDirection();

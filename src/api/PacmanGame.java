@@ -14,11 +14,11 @@ import static api.Mode.FRIGHTENED;
 import static api.Mode.INACTIVE;
 import static api.Mode.SCATTER;
 
-import hw4.Blinky;
-import hw4.Clyde;
-import hw4.Inky;
-import hw4.Pacman;
-import hw4.Pinky;
+import com.pacman.ghost.Blinky;
+import com.pacman.ghost.Clyde;
+import com.pacman.ghost.Inky;
+import com.pacman.ghost.Pacman;
+import com.pacman.ghost.Pinky;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
@@ -105,8 +105,9 @@ public class PacmanGame {
    * '$' represents the goal.
    *
    * @param rows array of strings, one per row of the maze
+   * @param frameRate the frames per second rate for this game
    */
-  public PacmanGame(String[] rows, int frameRate) {
+  public PacmanGame(final String[] rows, final int frameRate) {
     this.frameRate = frameRate;
     double enemyBaseSpeed = MAX_CELLS_PER_SECOND * ENEMY_SPEED_FACTOR / frameRate;
     double playerBaseSpeed = MAX_CELLS_PER_SECOND * PLAYER_SPEED_FACTOR / frameRate;
@@ -121,7 +122,7 @@ public class PacmanGame {
     for (int row = 0; row < height; ++row) {
       String s = rows[row];
       for (int col = 0; col < width; ++col) {
-        MazeCell current; // = new MazeCell();
+        MazeCell current;
         char c = s.charAt(col);
         if (c == '#') {
           current = new MazeCell(WALL);
@@ -144,17 +145,12 @@ public class PacmanGame {
 
         // check for player initial position
         if (c == 'S') {
-          // public Pacman(TwoDMaze maze, Location home, double baseSpeed, Direction
-          // initialDirection)
           Direction playerDir = findInitialDirection(row, col);
           Location playerHome = new Location(row, col);
           player = new Pacman(maze, playerHome, playerBaseSpeed, playerDir);
 
         } else {
           // check for ghost initial positions
-
-          // TODO: UNCOMMENT THESE LINES AS YOU GET THE GHOSTS IMPLEMENTED...
-
           if (c == 'B') {
             Location home = new Location(row, col);
             Direction dir = findInitialDirection(row, col);
@@ -162,27 +158,21 @@ public class PacmanGame {
             Actor a = new Blinky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
             enemyList.add(0, a);
             colorList.add(0, Color.RED);
-          }
-          else if (c == 'P')
-          {
+          } else if (c == 'P') {
             Location home = new Location(row, col);
             Direction dir = findInitialDirection(row, col);
             Location scatterTarget = new Location(-3, 2);
             Actor a = new Pinky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
             enemyList.add(a);
             colorList.add(Color.PINK);
-          }
-          else if (c == 'I')
-          {
+          } else if (c == 'I') {
             Location home = new Location(row, col);
             Direction dir = findInitialDirection(row, col);
             Location scatterTarget = new Location(height + 1, width - 1);
             Actor a = new Inky(maze, home, enemyBaseSpeed, dir, scatterTarget, rand);
             enemyList.add(a);
             colorList.add(Color.CYAN);
-          }
-          else if (c == 'C')
-          {
+          } else if (c == 'C') {
             Location home = new Location(row, col);
             Direction dir = findInitialDirection(row, col);
             Location scatterTarget = new Location(height + 1, 0);
@@ -238,11 +228,11 @@ public class PacmanGame {
   /**
    * Returns the cell at the given position.
    *
-   * @param row
-   * @param col
+   * @param row the row index
+   * @param col the column index
    * @return cell at the given position
    */
-  public MazeCell getCell(int row, int col) {
+  public MazeCell getCell(final int row, final int col) {
     return cells[row][col];
   }
 
@@ -315,14 +305,14 @@ public class PacmanGame {
    *
    * @param newDir desired new direction
    */
-  public void turnPlayer(Direction newDir) {
+  public void turnPlayer(final Direction newDir) {
     if (!playerDead && !levelOver()) {
       player.tryTurn(newDir);
     }
   }
 
   /**
-   * Returns the current value of the counter for the period of time the ghosts remain frightened
+   * Returns the current value of the counter for the period of time the ghosts remain frightened.
    *
    * @return current value of frightened countdown
    */
@@ -359,7 +349,9 @@ public class PacmanGame {
 
   /** Method invoked once per frame to update all aspects of game, player, and enemy states. */
   public void updateAll() {
-    if (levelOver()) return;
+    if (levelOver()) {
+      return;
+    }
 
     Descriptor desc = makeDescriptor();
 
@@ -481,7 +473,7 @@ public class PacmanGame {
   /**
    * Make a descriptor for current game state.
    *
-   * @return
+   * @return descriptor with current game state
    */
   protected Descriptor makeDescriptor() {
     Location enemyLoc = null;
@@ -495,11 +487,11 @@ public class PacmanGame {
    * Choose an initial direction for the player or enemy. This just checks up, left, down, right for
    * a non-wall, in that order.
    *
-   * @param row
-   * @param col
-   * @return
+   * @param row the row index
+   * @param col the column index  
+   * @return direction to move initially
    */
-  private Direction findInitialDirection(int row, int col) {
+  private Direction findInitialDirection(final int row, final int col) {
     // check in order up, left, down, right for a non-wall
     if (!getCell(row - 1, col).isWall()) {
       return UP;
