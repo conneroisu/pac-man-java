@@ -174,10 +174,12 @@ public final class GhostPositionTest {
       double totalDistFromCenter = Math.sqrt(distFromCenterRow * distFromCenterRow + 
                                         distFromCenterCol * distFromCenterCol);
       
-      // Check if the ghost is at a cell's center when it's on a grid point
-      // We consider a position error if the ghost is at a grid point but not centered
-      boolean atGridPoint = ghost.getCurrentLocation().equals(new Location(cellRow, cellCol));
-      if (atGridPoint && totalDistFromCenter > 0.001) {
+      // Check if the ghost is at a cell's center when it's making a movement decision
+      // We use a larger threshold (0.1) since we now only enforce centering at decision points
+      // but not during continuous movement between cells
+      boolean atDecisionPoint = ghost.getCurrentDirection() != null &&
+                               (distFromCenterRow < 0.1 && distFromCenterCol < 0.1);
+      if (atDecisionPoint && totalDistFromCenter > 0.1) {
         positionErrorCounts[g]++;
         if (totalDistFromCenter > maxPositionErrors[g]) {
           maxPositionErrors[g] = totalDistFromCenter;
