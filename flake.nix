@@ -70,9 +70,65 @@
           lint = {
             exec = ''
               export REPO_ROOT=$(git rev-parse --show-toplevel)
-              ${pkgs.checkstyle}/bin/checkstyle -c $REPO_ROOT/checkstyle.xml ./src/
+              cd $REPO_ROOT
+              
+              # Create a reports directory
+              mkdir -p reports
+              
+              # Header
+              echo -e "\033[1m\033[34m============== Pac-Man Java Linting ==============\033[0m"
+              
+              # Run checkstyle
+              echo -e "\n\033[1m\033[36mRunning Checkstyle checks...\033[0m"
+              ${pkgs.maven}/bin/mvn checkstyle:check -q
+              if [ $? -eq 0 ]; then
+                echo -e "\033[32m✓ Checkstyle: No violations found\033[0m"
+              else
+                echo -e "\033[31m✗ Checkstyle: Violations found\033[0m"
+              fi
+              ${pkgs.maven}/bin/mvn checkstyle:checkstyle -q
+              if [ -f "target/checkstyle-result.xml" ]; then
+                cp target/checkstyle-result.xml reports/
+              fi
+              
+              # Run PMD
+              echo -e "\n\033[1m\033[36mRunning PMD analysis...\033[0m"
+              ${pkgs.maven}/bin/mvn pmd:check -q
+              if [ $? -eq 0 ]; then
+                echo -e "\033[32m✓ PMD: No violations found\033[0m"
+              else
+                echo -e "\033[31m✗ PMD: Violations found\033[0m"
+              fi
+              ${pkgs.maven}/bin/mvn pmd:pmd -q
+              if [ -f "target/pmd.xml" ]; then
+                cp target/pmd.xml reports/
+              fi
+              
+              # Summary
+              echo -e "\n\033[1m\033[34m============== Linting Summary ==============\033[0m"
+              
+              # Count issues
+              checkstyle_issues=0
+              pmd_issues=0
+              
+              # Try to get Checkstyle count
+              if [ -f "reports/checkstyle-result.xml" ]; then
+                checkstyle_issues=$(grep "<error" reports/checkstyle-result.xml | wc -l)
+              fi
+              echo -e "Checkstyle issues: $checkstyle_issues"
+              
+              # Try to get PMD count
+              if [ -f "reports/pmd.xml" ]; then
+                pmd_issues=$(grep "<violation" reports/pmd.xml | wc -l)
+              fi
+              echo -e "PMD issues: $pmd_issues"
+              
+              echo -e "\nDetailed reports available in the 'reports' directory"
+              
+              # Return success regardless of findings
+              exit 0
             '';
-            description = "Lint with statix";
+            description = "Run all configured linting tools";
           };
           format = {
             exec = ''

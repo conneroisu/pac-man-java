@@ -57,5 +57,40 @@ java -cp bin ui.SimpleTest
 ## Project Structure
 
 - `src/api/` - Core game API interfaces and classes
-- `src/hw4/` - Implementation of game actors (Pacman, ghosts)
+- `src/com/pacman/ghost/` - Implementation of game actors (Pacman, ghosts)
 - `src/ui/` - User interface classes and test runners
+
+## Code Quality & Linting
+
+This project uses multiple linting tools to ensure code quality:
+
+### Running Linting Checks
+
+```bash
+# Run all linting checks with the simplified command
+./lint
+
+# If using Nix
+nix develop -c lint
+
+# Run specific linting tools
+./mvnw checkstyle:check     # Run Checkstyle only
+./mvnw pmd:check            # Run PMD only
+./mvnw pmd:pmd              # Generate PMD report
+
+# Run all verification including linting
+./mvnw verify
+```
+
+### Linting Configuration
+
+- **Checkstyle**: Style enforcement and formatting rules
+  - Configuration: `checkstyle.xml`
+  - Suppressions: `suppressions.xml`
+
+- **SpotBugs**: Bug pattern detection
+  - Exclusions: `spotbugs-exclude.xml`
+  - Includes FindSecBugs plugin for security checks
+
+- **PMD**: Static code analysis
+  - Custom ruleset: `pmd-ruleset.xml`

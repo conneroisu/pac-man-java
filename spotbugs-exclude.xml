@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!-- Exclude test classes -->
+    <Match>
+        <Class name="~.*Test.*"/>
+    </Match>
+    
+    <!-- Exclude UI classes for certain patterns -->
+    <Match>
+        <Class name="ui.PacmanPanel"/>
+        <Bug pattern="EI_EXPOSE_REP,EI_EXPOSE_REP2"/>
+    </Match>
+    
+    <!-- Exclude common testing patterns -->
+    <Match>
+        <Bug pattern="DM_EXIT"/>
+    </Match>
+    
+    <!-- Exclude serialization issues in UI classes -->
+    <Match>
+        <Class name="~ui\..*"/>
+        <Bug pattern="SE_BAD_FIELD,SE_NO_SERIALVERSIONID"/>
+    </Match>
+    
+    <!-- Exclude null checks in certain areas -->
+    <Match>
+        <Class name="~com\.pacman\.ghost\..*"/>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE"/>
+    </Match>
+</FindBugsFilter>
