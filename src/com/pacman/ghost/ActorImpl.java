@@ -392,7 +392,13 @@ public abstract class ActorImpl implements Actor {
     Location bestLoc = null;
     double shortestDistance = Double.MAX_VALUE;
     
-    // First pass: try all directions except opposite
+    // Count valid moves to detect dead-end situations
+    int validMoveCount = 0;
+    Direction[] validDirections = new Direction[4];
+    Location[] validLocations = new Location[4];
+    double[] validDistances = new double[4];
+    
+    // First pass: collect all valid directions except opposite
     for (Direction dir : directions) {
       // Skip the opposite direction unless it's the only option
       if (dir == oppositeDir) {
@@ -405,15 +411,49 @@ public abstract class ActorImpl implements Actor {
         continue;
       }
       
-      
       // Calculate distance to target
       double distance = calculateDistanceTween(nextLoc, targetLoc);
+      
+      validDirections[validMoveCount] = dir;
+      validLocations[validMoveCount] = nextLoc;
+      validDistances[validMoveCount] = distance;
+      validMoveCount++;
       
       // Choose this direction if it's better
       if (distance < shortestDistance) {
         shortestDistance = distance;
         bestDir = dir;
         bestLoc = nextLoc;
+      }
+    }
+    
+    // Strong anti-oscillation: if we have multiple valid moves, strongly prefer continuing straight
+    if (validMoveCount > 1) {
+      for (int i = 0; i < validMoveCount; i++) {
+        if (validDirections[i] == currentDirection) {
+          // Give STRONG preference to continuing in same direction
+          // Only change if another direction is MUCH better (5+ units)
+          double currentDirDistance = validDistances[i];
+          if (currentDirDistance <= shortestDistance + 5.0) {
+            bestDir = currentDirection;
+            bestLoc = validLocations[i];
+            logMovement("CONTINUING_STRAIGHT_TO_AVOID_OSCILLATION");
+            break;
+          }
+        }
+      }
+    }
+    
+    // For very constrained situations (only 1-2 moves), add extra anti-oscillation
+    if (validMoveCount <= 2 && bestDir != null) {
+      // In constrained areas, be even more reluctant to change direction
+      for (int i = 0; i < validMoveCount; i++) {
+        if (validDirections[i] == currentDirection) {
+          bestDir = currentDirection;
+          bestLoc = validLocations[i];
+          logMovement("CONSTRAINED_AREA_CONTINUING_STRAIGHT");
+          break;
+        }
       }
     }
     
@@ -431,7 +471,7 @@ public abstract class ActorImpl implements Actor {
     if (bestDir != null) {
       nextDirection = bestDir;
       nextLocation = bestLoc;
-      logMovement("TARGET_PATH_DIR=" + bestDir + ", DISTANCE=" + shortestDistance);
+      logMovement("TARGET_PATH_DIR=" + bestDir + ", DISTANCE=" + shortestDistance + ", VALID_MOVES=" + validMoveCount);
     } else {
       // Extremely rare - no valid moves at all
       nextLocation = currentLoc;
@@ -586,12 +626,15 @@ public abstract class ActorImpl implements Actor {
     double distToColCenter = Math.abs(currentColExact - colCenter);
     boolean atCellCenter = distToRowCenter < ERR && distToColCenter < ERR;
     
-    // At cell center - recalculate movement decisions
-    if (atCellCenter) {
-      // Snap exactly to center for precision
-      setRowExact(rowCenter);
-      setColExact(colCenter);
-      
+    // Check if we need to make a decision (at center or entering new cell)
+    boolean movedToNewCell = !previousLocation.equals(getCurrentLocation());
+    if (movedToNewCell) {
+      pastCenter = false; // Reset for new cell
+      logMovement("MOVED_TO_NEW_CELL");
+    }
+    
+    // At cell center - make movement decisions
+    if (atCellCenter && !pastCenter) {
       // Recalculate next move
       calculateNextCell(description);
       logMovement("AT_CENTER_RECALCULATING");
@@ -606,53 +649,49 @@ public abstract class ActorImpl implements Actor {
       pastCenter = true;
     }
     
-    // Calculate new position based on current direction
+    // Simple directional movement with proper axis alignment
     double newRowExact = currentRowExact;
     double newColExact = currentColExact;
     
-    // Check if we can move in the current direction before applying movement
-    Location testNextLoc = getNextLocation(currentLocation, currentDirection);
-    boolean canMoveForward = (testNextLoc != null);
+    // Check if we can move in current direction
+    Location testNextLoc = getNextLocation(getCurrentLocation(), currentDirection);
+    boolean canMove = (testNextLoc != null && !maze.isWall(testNextLoc.row(), testNextLoc.col()));
     
-    if (!canMoveForward) {
-      // We're blocked - need to find a new direction immediately
-      logMovement("BLOCKED_FINDING_NEW_DIRECTION");
-      
-      // Force recalculation to find a valid direction
+    if (!canMove) {
+      // We're blocked - recalculate direction
+      logMovement("BLOCKED_RECALCULATING");
       calculateNextCell(description);
-      
       if (nextDirection != null && nextDirection != currentDirection) {
         currentDirection = nextDirection;
-        logMovement("CHANGED_TO_VALID_DIRECTION=" + currentDirection);
-        // Try again with new direction
-        testNextLoc = getNextLocation(currentLocation, currentDirection);
-        canMoveForward = (testNextLoc != null);
+        logMovement("DIRECTION_CHANGED_TO=" + currentDirection);
       }
     }
     
-    // Apply movement if we can move
-    if (canMoveForward) {
+    // Apply movement in current direction
+    if (canMove || (nextDirection != null && getNextLocation(getCurrentLocation(), currentDirection) != null)) {
       switch (currentDirection) {
         case UP:
           newRowExact = Math.max(0.5, currentRowExact - increment);
+          newColExact = Math.floor(currentColExact) + 0.5; // Stay centered on column
           break;
         case DOWN:
           newRowExact = Math.min(maze.getNumRows() - 1.5, currentRowExact + increment);
+          newColExact = Math.floor(currentColExact) + 0.5; // Stay centered on column
           break;
         case LEFT:
           newColExact = currentColExact - increment;
+          newRowExact = Math.floor(currentRowExact) + 0.5; // Stay centered on row
           // Handle tunnel wraparound
           if (newColExact < 0.5) {
             newColExact = maze.getNumColumns() - 0.5;
-            logMovement("TUNNEL_WRAP_LEFT");
           }
           break;
         case RIGHT:
           newColExact = currentColExact + increment;
+          newRowExact = Math.floor(currentRowExact) + 0.5; // Stay centered on row
           // Handle tunnel wraparound
           if (newColExact >= maze.getNumColumns() - 0.5) {
             newColExact = 0.5;
-            logMovement("TUNNEL_WRAP_RIGHT");
           }
           break;
         default:
@@ -666,30 +705,21 @@ public abstract class ActorImpl implements Actor {
       if (newCellRow >= 0 && newCellRow < maze.getNumRows() && 
           newCellCol >= 0 && newCellCol < maze.getNumColumns() &&
           !maze.isWall(newCellRow, newCellCol)) {
-        // Safe to update position
+        // Safe to move
         setRowExact(newRowExact);
         setColExact(newColExact);
         currentLocation = new Location(newCellRow, newCellCol);
         logMovement("MOVED_TO_POSITION");
       } else {
-        // Would enter a wall - stay in place and find new direction
-        logMovement("WOULD_ENTER_WALL_STAYING_PUT");
-        calculateNextCell(description);
-        if (nextDirection != null) {
-          currentDirection = nextDirection;
-          logMovement("FORCED_DIRECTION_CHANGE=" + currentDirection);
-        }
+        // Would hit wall - stay in place and force recalculation
+        setRowExact(rowCenter);
+        setColExact(colCenter);
+        pastCenter = false; // Force recalculation next frame
+        logMovement("WALL_COLLISION_STAYING_PUT");
       }
     } else {
-      // Can't move at all - this shouldn't happen with proper direction calculation
-      logMovement("COMPLETELY_STUCK");
-    }
-    
-    // Check if we've moved to a new cell
-    boolean movedToNewCell = !previousLocation.equals(currentLocation);
-    if (movedToNewCell) {
-      logMovement("MOVED_TO_NEW_CELL");
-      pastCenter = false; // Reset for new cell
+      // Can't move at all - stay in place
+      logMovement("COMPLETELY_BLOCKED");
     }
     
     logMovement("UPDATE_END");
