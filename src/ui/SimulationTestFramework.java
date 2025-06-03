@@ -394,17 +394,33 @@ public class SimulationTestFramework {
       }
       
       for (int i = LOOP_DETECTION_WINDOW; i < trace.size(); i++) {
+        GhostFrame currentFrame = trace.get(i);
+        
+        // Skip INACTIVE ghosts - they're supposed to stay in place
+        if (currentFrame.mode == Mode.INACTIVE) {
+          continue;
+        }
+        
         // Check the last LOOP_DETECTION_WINDOW frames
         List<Location> recentPositions = new ArrayList<>();
         for (int j = i - LOOP_DETECTION_WINDOW; j <= i; j++) {
-          recentPositions.add(trace.get(j).location);
+          GhostFrame frame = trace.get(j);
+          // Only count frames where ghost is active
+          if (frame.mode != Mode.INACTIVE) {
+            recentPositions.add(frame.location);
+          }
+        }
+        
+        // Need sufficient active frames to detect a loop
+        if (recentPositions.size() < 10) {
+          continue;
         }
         
         // Count unique positions
         long uniquePositions = recentPositions.stream().distinct().count();
         
         if (uniquePositions < MIN_UNIQUE_POSITIONS) {
-          violations.add(trace.get(i));
+          violations.add(currentFrame);
         }
       }
     }

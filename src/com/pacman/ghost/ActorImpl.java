@@ -71,10 +71,8 @@ public abstract class ActorImpl implements Actor {
   
   /** Random number generator for movement decisions. */
   protected Random rand;
+  
 
-  // Movement tracking variables
-  private Location previousStuckLocation = null;
-  private int stuckFrameCount = 0;
   
   // Logging
   private static PrintWriter logWriter;
@@ -158,8 +156,6 @@ public abstract class ActorImpl implements Actor {
     nextDirection = homeDirection;
     nextLocation = getNextLocation(currentLocation, nextDirection);
 
-    // Reset location tracking
-    previousStuckLocation = null;
     logMovement("POST-RESET");
   }
 
@@ -229,39 +225,34 @@ public abstract class ActorImpl implements Actor {
       return;
     }
 
-    // Special case: If we're in the ghost house, try to move upward to escape
+    // Special case: If we're in the ghost house area, navigate carefully
     Location homeLoc = getHomeLocation();
-    boolean nearHome = false;
+    boolean inGhostHouse = false;
 
     if (homeLoc != null) {
-      nearHome = (currentLoc.row() == homeLoc.row() && Math.abs(currentLoc.col() - homeLoc.col()) <= 2)
-          || (currentLoc.col() == homeLoc.col() && Math.abs(currentLoc.row() - homeLoc.row()) <= 2);
+      // Check if we're in the ghost house area (typically center of maze)
+      int centerRow = maze.getNumRows() / 2;
+      int centerCol = maze.getNumColumns() / 2;
+      inGhostHouse = Math.abs(currentLoc.row() - centerRow) <= 2 && 
+                     Math.abs(currentLoc.col() - centerCol) <= 3;
     }
 
-    if (nearHome && getMode() != Mode.INACTIVE) {
-      // Try to move UP to escape ghost house
-      Location upLoc = getNextLocation(currentLoc, Direction.UP);
-      if (upLoc != null) {
-        nextDirection = Direction.UP;
-        nextLocation = upLoc;
-        logMovement("GHOST_HOUSE_ESCAPE_UP");
-        return;
-      }
+    if (inGhostHouse && getMode() != Mode.INACTIVE) {
+      // For ghost house escape, prefer moving toward the exit (usually upward)
+      // But avoid walls by checking each direction carefully
+      Direction[] escapeOrder = { Direction.UP, Direction.LEFT, Direction.RIGHT, Direction.DOWN };
       
-      // If we can't move up, try other directions to navigate to an exit
-      Location leftLoc = getNextLocation(currentLoc, Direction.LEFT);
-      Location rightLoc = getNextLocation(currentLoc, Direction.RIGHT);
-      
-      if (currentLoc.col() < 13 && rightLoc != null) {
-        nextDirection = Direction.RIGHT;
-        nextLocation = rightLoc;
-        logMovement("GHOST_HOUSE_ESCAPE_RIGHT");
-        return;
-      } else if (currentLoc.col() > 13 && leftLoc != null) {
-        nextDirection = Direction.LEFT;
-        nextLocation = leftLoc;
-        logMovement("GHOST_HOUSE_ESCAPE_LEFT");
-        return;
+      for (Direction dir : escapeOrder) {
+        Location loc = getNextLocation(currentLoc, dir);
+        if (loc != null) {
+          // Extra check: make sure the destination isn't a wall
+          if (!maze.isWall(loc.row(), loc.col())) {
+            nextDirection = dir;
+            nextLocation = loc;
+            logMovement("GHOST_HOUSE_ESCAPE_" + dir);
+            return;
+          }
+        }
       }
     }
 
@@ -269,26 +260,26 @@ public abstract class ActorImpl implements Actor {
     Location nextLoc = getNextLocation(currentLoc, currentDirection);
     
     // If we can move in the current direction, keep going
-    if (nextLoc != null) {
+    if (nextLoc != null && !maze.isWall(nextLoc.row(), nextLoc.col())) {
       nextDirection = currentDirection;
       nextLocation = nextLoc;
       logMovement("CONTINUE_CURRENT_DIRECTION");
       return;
     }
     
-    // If we can't move in current direction, look for alternatives
-    // Try all directions except the opposite of current direction
+    // If we can't move in current direction, we need to choose a new one
+    // This prevents infinite loops by ensuring we always find a valid path
     Direction[] directions = { Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT };
     Direction oppositeDir = getOppositeDirection(currentDirection);
     
+    // First try non-reverse directions
     for (Direction dir : directions) {
-      // Skip the opposite direction (no reversing)
-      if (dir == oppositeDir) {
+      if (dir == oppositeDir || dir == currentDirection) {
         continue;
       }
       
       Location loc = getNextLocation(currentLoc, dir);
-      if (loc != null) {
+      if (loc != null && !maze.isWall(loc.row(), loc.col())) {
         nextDirection = dir;
         nextLocation = loc;
         logMovement("FOUND_ALTERNATIVE_DIRECTION: " + dir);
@@ -296,21 +287,28 @@ public abstract class ActorImpl implements Actor {
       }
     }
     
-    // If we're completely stuck, allow reversing as a last resort
+    // If no other direction works, allow reversing
     Location reverseLocation = getNextLocation(currentLoc, oppositeDir);
-    if (reverseLocation != null) {
+    if (reverseLocation != null && !maze.isWall(reverseLocation.row(), reverseLocation.col())) {
       nextDirection = oppositeDir;
       nextLocation = reverseLocation;
       logMovement("REVERSING_DIRECTION_AS_LAST_RESORT");
       return;
     }
     
-    // If we couldn't find any valid direction including reverse (extremely rare in a valid maze),
-    // we'll just stay in the current location until conditions change
-    if (nextLocation == null) {
-      nextLocation = currentLoc;
-      logMovement("NO_VALID_MOVES_AVAILABLE");
+    // Fallback: stay in current location but set a valid direction for next attempt
+    nextLocation = currentLoc;
+    // Try to find ANY valid direction to unstick
+    for (Direction dir : directions) {
+      Location loc = getNextLocation(currentLoc, dir);
+      if (loc != null && !maze.isWall(loc.row(), loc.col())) {
+        nextDirection = dir;
+        currentDirection = dir; // Force direction change
+        logMovement("EMERGENCY_UNSTICK_DIRECTION=" + dir);
+        return;
+      }
     }
+    logMovement("NO_VALID_MOVES_AVAILABLE");
   }
 
   /**
@@ -333,12 +331,6 @@ public abstract class ActorImpl implements Actor {
    */
   public void calculateNextCell(final Descriptor d) {
     logMovement("CALCULATE_NEXT_CELL_START");
-    
-    // Skip calculation if we're past the center and still in the same cell
-    if (pastCenter && nextLocation != null) {
-      logMovement("SKIPPING_CALC_PAST_CENTER");
-      return;
-    }
 
     // Check for INACTIVE mode - in which case we do nothing
     if (getMode() == Mode.INACTIVE) {
@@ -346,17 +338,17 @@ public abstract class ActorImpl implements Actor {
       return;
     }
 
-    // Special handling for FRIGHTENED mode
-    if (getMode() == Mode.FRIGHTENED) {
-      logMovement("HANDLING_FRIGHTENED_MODE");
-      handleFrightenedMode();
-      return;
-    }
-
     // Get current location and validate
     Location currentLoc = getCurrentLocation();
     if (currentLoc == null) {
       logMovement("CURRENT_LOC_NULL");
+      return;
+    }
+
+    // Special handling for FRIGHTENED mode
+    if (getMode() == Mode.FRIGHTENED) {
+      logMovement("HANDLING_FRIGHTENED_MODE");
+      handleFrightenedMode();
       return;
     }
 
@@ -392,7 +384,7 @@ public abstract class ActorImpl implements Actor {
       return;
     }
     
-    // Get all possible next locations (excluding reversal)
+    // Get all possible directions
     Direction oppositeDir = getOppositeDirection(currentDirection);
     Direction[] directions = { Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT };
     
@@ -400,52 +392,50 @@ public abstract class ActorImpl implements Actor {
     Location bestLoc = null;
     double shortestDistance = Double.MAX_VALUE;
     
-    // Add tiny random factor to break ties consistently
-    double[] distanceAdjustments = new double[4];
-    final double RANDOMNESS_FACTOR = 0.02;
-    for (int i = 0; i < 4; i++) {
-      distanceAdjustments[i] = rand.nextDouble() * RANDOMNESS_FACTOR;
-    }
-    
-    // Evaluate each direction
-    for (int i = 0; i < directions.length; i++) {
-      Direction dir = directions[i];
-      
-      // Skip the opposite direction (no reversing)
+    // First pass: try all directions except opposite
+    for (Direction dir : directions) {
+      // Skip the opposite direction unless it's the only option
       if (dir == oppositeDir) {
         continue;
       }
       
       Location nextLoc = getNextLocation(currentLoc, dir);
-      if (nextLoc == null) {
+      if (nextLoc == null || maze.isWall(nextLoc.row(), nextLoc.col())) {
         // Wall or boundary in this direction
         continue;
       }
       
+      
       // Calculate distance to target
       double distance = calculateDistanceTween(nextLoc, targetLoc);
       
-      // Apply small adjustment to break ties
-      distance -= distanceAdjustments[i];
-      
-      // Choose this direction if it's better than what we've seen so far
-      // For UP direction, give it slightly higher priority when distances are equal
-      if (distance < shortestDistance || 
-          (Math.abs(distance - shortestDistance) < ERR && dir == Direction.UP && bestDir != Direction.UP)) {
+      // Choose this direction if it's better
+      if (distance < shortestDistance) {
         shortestDistance = distance;
         bestDir = dir;
         bestLoc = nextLoc;
       }
     }
     
-    // If we found a valid direction, use it
+    // If no valid direction found, allow reversal as last resort
+    if (bestDir == null) {
+      Location reverseLoc = getNextLocation(currentLoc, oppositeDir);
+      if (reverseLoc != null && !maze.isWall(reverseLoc.row(), reverseLoc.col())) {
+        bestDir = oppositeDir;
+        bestLoc = reverseLoc;
+        logMovement("FORCED_REVERSAL_TO_TARGET");
+      }
+    }
+    
+    // Set the result
     if (bestDir != null) {
       nextDirection = bestDir;
       nextLocation = bestLoc;
-      logMovement("BEST_DIR=" + bestDir + ", DISTANCE=" + shortestDistance);
+      logMovement("TARGET_PATH_DIR=" + bestDir + ", DISTANCE=" + shortestDistance);
     } else {
-      // If we couldn't find a valid direction (unlikely), just continue
-      calculateNextCellLocation();
+      // Extremely rare - no valid moves at all
+      nextLocation = currentLoc;
+      logMovement("NO_VALID_TARGET_PATH");
     }
   }
 
@@ -476,7 +466,7 @@ public abstract class ActorImpl implements Actor {
       }
       
       Location nextLoc = getNextLocation(currentLoc, directions[i]);
-      if (nextLoc != null) {
+      if (nextLoc != null && !maze.isWall(nextLoc.row(), nextLoc.col())) {
         validDirections[validMoveCount] = directions[i];
         validLocations[validMoveCount] = nextLoc;
         validMoveCount++;
@@ -502,8 +492,8 @@ public abstract class ActorImpl implements Actor {
         }
       }
       
-      // 75% chance to continue in current direction if possible
-      if (canContinueSameDirection && rand.nextDouble() < 0.75) {
+      // 80% chance to continue in current direction if possible (reduce oscillation)
+      if (canContinueSameDirection && rand.nextDouble() < 0.8) {
         nextDirection = validDirections[currentDirIndex];
         nextLocation = validLocations[currentDirIndex];
         logMovement("FRIGHTENED_CONTINUE_SAME_DIR");
@@ -525,7 +515,7 @@ public abstract class ActorImpl implements Actor {
     } else {
       // No valid directions (rare) - allow reverse as last resort
       Location reverseLoc = getNextLocation(currentLoc, oppositeDir);
-      if (reverseLoc != null) {
+      if (reverseLoc != null && !maze.isWall(reverseLoc.row(), reverseLoc.col())) {
         nextDirection = oppositeDir;
         nextLocation = reverseLoc;
         logMovement("FRIGHTENED_REVERSING");
@@ -536,6 +526,7 @@ public abstract class ActorImpl implements Actor {
       }
     }
   }
+  
   
   /**
    * Calculates the distance between two given locations using the distance formula.
@@ -585,8 +576,8 @@ public abstract class ActorImpl implements Actor {
     double increment = getCurrentIncrement();
     double currentRowExact = getRowExact();
     double currentColExact = getColExact();
-    int currentRow = (int) currentRowExact;
-    int currentCol = (int) currentColExact;
+    int currentRow = (int) Math.floor(currentRowExact);
+    int currentCol = (int) Math.floor(currentColExact);
     
     // Calculate distance to cell center
     double rowCenter = currentRow + 0.5;
@@ -595,312 +586,110 @@ public abstract class ActorImpl implements Actor {
     double distToColCenter = Math.abs(currentColExact - colCenter);
     boolean atCellCenter = distToRowCenter < ERR && distToColCenter < ERR;
     
-    // If we're at a cell center, check if we need to calculate a new target
+    // At cell center - recalculate movement decisions
     if (atCellCenter) {
-      // Always recalculate next target cell at cell centers
+      // Snap exactly to center for precision
+      setRowExact(rowCenter);
+      setColExact(colCenter);
+      
+      // Recalculate next move
       calculateNextCell(description);
       logMovement("AT_CENTER_RECALCULATING");
 
-      // If we need to change direction and we're at a center, do it
+      // Change direction if needed
       if (nextDirection != null && nextDirection != currentDirection) {
-        // First snap exactly to center to avoid precision issues
-        setRowExact(rowCenter);
-        setColExact(colCenter);
-        
-        // Change direction
         Direction oldDirection = currentDirection;
         currentDirection = nextDirection;
         logMovement("CHANGED_DIRECTION_FROM=" + oldDirection + "_TO=" + currentDirection);
-        
-        // Reset pastCenter flag when changing direction
-        pastCenter = false;
-      } else {
-        // Mark that we're at the center point (used for decision making)
-        pastCenter = false;
       }
-    } else {
-      // Not at center, check if we've passed the center point in our current direction
-      // This is important for determining when to make the next decision
-      switch (currentDirection) {
-        case UP:
-          pastCenter = currentRowExact < rowCenter;
-          break;
-        case DOWN:
-          pastCenter = currentRowExact > rowCenter;
-          break;
-        case LEFT:
-          pastCenter = currentColExact < colCenter;
-          break;
-        case RIGHT:
-          pastCenter = currentColExact > colCenter;
-          break;
-        default:
-          break;
-      }
+      
+      pastCenter = true;
     }
     
-    // Determine next position based on direction with precise wall collision detection
+    // Calculate new position based on current direction
     double newRowExact = currentRowExact;
     double newColExact = currentColExact;
     
-    // Before attempting to move, check if the move is valid (not into a wall)
-    boolean canMove = true;
-    boolean willCrossCell = false;
-    int nextCellRow = currentRow;
-    int nextCellCol = currentCol;
+    // Check if we can move in the current direction before applying movement
+    Location testNextLoc = getNextLocation(currentLocation, currentDirection);
+    boolean canMoveForward = (testNextLoc != null);
     
-    // Calculate next cell we might enter based on direction
-    switch (currentDirection) {
-      case UP:
-        // Moving up means row decreases
-        if (currentRowExact - increment < currentRow) {
-          // Will cross to previous row
-          willCrossCell = true;
-          nextCellRow = currentRow - 1;
-          nextCellCol = currentCol;
-        }
-        break;
-      case DOWN:
-        // Moving down means row increases
-        if (currentRowExact + increment >= currentRow + 1) {
-          // Will cross to next row
-          willCrossCell = true;
-          nextCellRow = currentRow + 1;
-          nextCellCol = currentCol;
-        }
-        break;
-      case LEFT:
-        // Moving left means column decreases
-        if (currentColExact - increment < currentCol) {
-          // Will cross to previous column
-          willCrossCell = true;
-          nextCellRow = currentRow;
-          nextCellCol = currentCol - 1;
-          
-          // Handle wraparound tunnel
-          if (nextCellCol < 0) {
-            // Wraparound to the right side of the maze
-            nextCellCol = maze.getNumColumns() - 1;
-          }
-        }
-        break;
-      case RIGHT:
-        // Moving right means column increases
-        if (currentColExact + increment >= currentCol + 1) {
-          // Will cross to next column
-          willCrossCell = true;
-          nextCellRow = currentRow;
-          nextCellCol = currentCol + 1;
-          
-          // Handle wraparound tunnel
-          if (nextCellCol >= maze.getNumColumns()) {
-            // Wraparound to the left side of the maze
-            nextCellCol = 0;
-          }
-        }
-        break;
-      default:
-        // No movement for default
-        canMove = false;
-        break;
-    }
-    
-    // Check if the next cell is a wall and adjust movement accordingly
-    boolean hitWall = false;
-    if (willCrossCell) {
-      // Check if next cell is within maze bounds
-      boolean inBounds = nextCellRow >= 0 && nextCellRow < maze.getNumRows() &&
-                          nextCellCol >= 0 && nextCellCol < maze.getNumColumns();
+    if (!canMoveForward) {
+      // We're blocked - need to find a new direction immediately
+      logMovement("BLOCKED_FINDING_NEW_DIRECTION");
       
-      // If next cell is a wall, we can't move into it
-      if (inBounds && maze.isWall(nextCellRow, nextCellCol)) {
-        hitWall = true;
-        
-        // Calculate exact position at cell boundary to stop at
-        switch (currentDirection) {
-          case UP:
-            // Stop at bottom edge of wall cell
-            newRowExact = nextCellRow + 1.0;
-            break;
-          case DOWN:
-            // Stop at top edge of wall cell
-            newRowExact = nextCellRow;
-            break;
-          case LEFT:
-            // Stop at right edge of wall cell
-            newColExact = nextCellCol + 1.0;
-            break;
-          case RIGHT:
-            // Stop at left edge of wall cell
-            newColExact = nextCellCol;
-            break;
-          default:
-            break;
-        }
-        
-        logMovement("HIT_WALL_BOUNDARY_STOP");
-        canMove = false;
+      // Force recalculation to find a valid direction
+      calculateNextCell(description);
+      
+      if (nextDirection != null && nextDirection != currentDirection) {
+        currentDirection = nextDirection;
+        logMovement("CHANGED_TO_VALID_DIRECTION=" + currentDirection);
+        // Try again with new direction
+        testNextLoc = getNextLocation(currentLocation, currentDirection);
+        canMoveForward = (testNextLoc != null);
       }
     }
     
-    // If we can move, apply movement
-    if (canMove) {
+    // Apply movement if we can move
+    if (canMoveForward) {
       switch (currentDirection) {
         case UP:
-          newRowExact = currentRowExact - increment;
+          newRowExact = Math.max(0.5, currentRowExact - increment);
           break;
         case DOWN:
-          newRowExact = currentRowExact + increment;
+          newRowExact = Math.min(maze.getNumRows() - 1.5, currentRowExact + increment);
           break;
         case LEFT:
           newColExact = currentColExact - increment;
           // Handle tunnel wraparound
-          if (newColExact < 0) {
-            newColExact += maze.getNumColumns();
+          if (newColExact < 0.5) {
+            newColExact = maze.getNumColumns() - 0.5;
             logMovement("TUNNEL_WRAP_LEFT");
           }
           break;
         case RIGHT:
           newColExact = currentColExact + increment;
           // Handle tunnel wraparound
-          if (newColExact >= maze.getNumColumns()) {
-            newColExact -= maze.getNumColumns();
+          if (newColExact >= maze.getNumColumns() - 0.5) {
+            newColExact = 0.5;
             logMovement("TUNNEL_WRAP_RIGHT");
           }
           break;
         default:
           break;
       }
-    }
-    
-    // Update position
-    setRowExact(newRowExact);
-    setColExact(newColExact);
-    
-    // Update current location (integer grid position)
-    // Java's (int) cast truncates toward zero, need to handle negative values explicitly
-    int newRow = (int) Math.floor(newRowExact);
-    int newCol = (int) Math.floor(newColExact);
-    
-    // Always create a new Location object to avoid reference issues
-    currentLocation = new Location(newRow, newCol);
-    
-    // Check if we've moved to a new cell (for tracking purposes)
-    boolean movedToNewCell = !previousLocation.equals(currentLocation);
-    if (movedToNewCell) {
-      logMovement("MOVED_TO_NEW_CELL");
-    }
-    
-    // If we hit a wall, we need to choose a new direction
-    if (hitWall) {
-      logMovement("HIT_WALL_CHOOSING_NEW_DIRECTION");
       
-      // Get available directions at current position
-      Direction oppositeDir = getOppositeDirection(currentDirection);
-      Direction[] directions = { Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT };
+      // Final safety check - ensure we don't enter a wall
+      int newCellRow = (int) Math.floor(newRowExact);
+      int newCellCol = (int) Math.floor(newColExact);
       
-      // Find a valid direction that's not opposite (no immediate reversal)
-      for (Direction dir : directions) {
-        // Skip the opposite direction (no reversing)
-        if (dir == oppositeDir) {
-          continue;
-        }
-        
-        // Skip current direction (we just hit a wall)
-        if (dir == currentDirection) {
-          continue;
-        }
-        
-        // Check if this direction leads to a valid cell
-        Location loc = getNextLocation(currentLocation, dir);
-        if (loc != null) {
-          // We found a valid direction to move
-          currentDirection = dir;
-          nextDirection = dir;
-          
-          // Make sure we're in a valid position for the new direction
-          // For horizontal movements, ensure row is centered
-          // For vertical movements, ensure column is centered
-          if (dir == Direction.LEFT || dir == Direction.RIGHT) {
-            setRowExact(newRow + 0.5);
-          } else {
-            setColExact(newCol + 0.5);
-          }
-          
-          logMovement("NEW_DIRECTION_AFTER_WALL=" + dir);
-          
-          // Recalculate next cell with new direction
-          calculateNextCell(description);
-          break;
-        }
-      }
-      
-      // If we still couldn't find a valid direction, allow reversal as last resort
-      if (currentDirection == null || currentDirection == oppositeDir) {
-        Location reverseLocation = getNextLocation(currentLocation, oppositeDir);
-        if (reverseLocation != null) {
-          currentDirection = oppositeDir;
-          nextDirection = oppositeDir;
-          
-          // Center position for reliability
-          setRowExact(newRow + 0.5);
-          setColExact(newCol + 0.5);
-          
-          logMovement("REVERSE_DIRECTION_AFTER_WALL");
-          
-          // Recalculate next cell with new direction
-          calculateNextCell(description);
-        }
-      }
-    }
-    
-    // If we haven't moved in a while, check if we're stuck
-    if (previousStuckLocation != null && previousStuckLocation.equals(currentLocation)) {
-      stuckFrameCount++;
-      
-      // If stuck for several frames, force recalculation and new direction
-      if (stuckFrameCount > 5) {
-        logMovement("STUCK_DETECTION");
-        
-        // Center position for more reliable decision making
-        setRowExact(newRow + 0.5);
-        setColExact(newCol + 0.5);
-        
-        // Force recalculation
+      if (newCellRow >= 0 && newCellRow < maze.getNumRows() && 
+          newCellCol >= 0 && newCellCol < maze.getNumColumns() &&
+          !maze.isWall(newCellRow, newCellCol)) {
+        // Safe to update position
+        setRowExact(newRowExact);
+        setColExact(newColExact);
+        currentLocation = new Location(newCellRow, newCellCol);
+        logMovement("MOVED_TO_POSITION");
+      } else {
+        // Would enter a wall - stay in place and find new direction
+        logMovement("WOULD_ENTER_WALL_STAYING_PUT");
         calculateNextCell(description);
-        
-        // Try all directions if still stuck
-        Direction[] allDirections = { Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT };
-        for (Direction dir : allDirections) {
-          Location loc = getNextLocation(currentLocation, dir);
-          if (loc != null) {
-            currentDirection = dir;
-            nextDirection = dir;
-            logMovement("UNSTUCK_CHANGE_TO=" + dir);
-            stuckFrameCount = 0;
-            break;
-          }
+        if (nextDirection != null) {
+          currentDirection = nextDirection;
+          logMovement("FORCED_DIRECTION_CHANGE=" + currentDirection);
         }
       }
     } else {
-      // Reset stuck counter if we moved
-      stuckFrameCount = 0;
+      // Can't move at all - this shouldn't happen with proper direction calculation
+      logMovement("COMPLETELY_STUCK");
     }
     
-    // Store current location for stuck detection
-    previousStuckLocation = currentLocation;
-    
-    // Final safety check - ensure we're in valid maze coordinates
-    if (getColExact() < 0) {
-      setColExact(0);
-    } else if (getColExact() >= maze.getNumColumns()) {
-      setColExact(maze.getNumColumns() - 0.001);
-    }
-    
-    if (getRowExact() < 0) {
-      setRowExact(0);
-    } else if (getRowExact() >= maze.getNumRows()) {
-      setRowExact(maze.getNumRows() - 0.001);
+    // Check if we've moved to a new cell
+    boolean movedToNewCell = !previousLocation.equals(currentLocation);
+    if (movedToNewCell) {
+      logMovement("MOVED_TO_NEW_CELL");
+      pastCenter = false; // Reset for new cell
     }
     
     logMovement("UPDATE_END");
@@ -1016,30 +805,7 @@ public abstract class ActorImpl implements Actor {
     Mode previousMode = currentMode;
     logMovement("SET_MODE_FROM_" + previousMode + "_TO_" + gMode);
 
-    // Set the new mode
-    currentMode = gMode;
-
-    // If ghost is transitioning from INACTIVE to active state
-    // or if we're entering a new mode, always recalculate path
-    if (previousMode == Mode.INACTIVE || previousMode != gMode) {
-      // Reset location tracking when mode changes
-      previousStuckLocation = null;
-
-      // If transitioning out of INACTIVE, force an upward movement
-      // This helps ghosts escape the ghost house
-      if (previousMode == Mode.INACTIVE && getCurrentLocation().equals(getHomeLocation())) {
-        currentDirection = Direction.UP;
-        logMovement("TRANSITIONING_FROM_INACTIVE_TO_UP");
-      }
-
-      // Recalculate next cell with new direction/mode
-      pastCenter = false;
-      if (description != null) {
-        calculateNextCell(description);
-      }
-    }
-
-    // Mode based speed adjustments
+    // Mode based speed adjustments - do this before setting mode
     final double frightenedSpeedFactor = 2.0 / 3.0;
     final double deadSpeedFactor = 2.0;
     
@@ -1052,6 +818,26 @@ public abstract class ActorImpl implements Actor {
     } else {
       currentIncrement = baseIncrement;
       logMovement("SET_SPEED_NORMAL=" + currentIncrement);
+    }
+
+    // Set the new mode
+    currentMode = gMode;
+
+    // If ghost is transitioning from INACTIVE to active state
+    // or if we're entering a new mode, always recalculate path
+    if (previousMode == Mode.INACTIVE || previousMode != gMode) {
+      // If transitioning out of INACTIVE, force an upward movement
+      // This helps ghosts escape the ghost house
+      if (previousMode == Mode.INACTIVE && getCurrentLocation().equals(getHomeLocation())) {
+        currentDirection = Direction.UP;
+        logMovement("TRANSITIONING_FROM_INACTIVE_TO_UP");
+      }
+
+      // Recalculate next cell with new direction/mode
+      pastCenter = false;
+      if (description != null) {
+        calculateNextCell(description);
+      }
     }
   }
 
@@ -1106,7 +892,7 @@ public abstract class ActorImpl implements Actor {
           + directionStr + "," 
           + nextLocationStr + "," 
           + modeStr + "," 
-          + stuckFrameCount + "," 
+          + "0" + "," 
           + pastCenter + ","
           + message);
       logWriter.flush();
