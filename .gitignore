@@ -1,6 +1,8 @@
 .direnv
 .vscode
 .idea
+.metadata
+.settings
 .claude
 *.iml
 target
