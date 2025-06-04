@@ -8,6 +8,7 @@ import api.MazeCell;
 import api.Mode;
 import api.PacmanGame;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -94,6 +95,12 @@ public final class PacmanPanel extends JPanel {
   /** Single increment. */
   private static final int SINGLE_INCREMENT = 1;
 
+  /** Font size for score display. */
+  private static final int SCORE_FONT_SIZE = 16;
+
+  /** Margin for score display. */
+  private static final int SCORE_MARGIN = 10;
+
   /** The grid to be displayed by this panel. */
   private final transient PacmanGame game;
 
@@ -169,6 +176,8 @@ public final class PacmanPanel extends JPanel {
 
     drawPacman(g);
     drawGhosts(g);
+    drawScore(g);
+    drawLives(g);
   }
 
   /**
@@ -287,6 +296,32 @@ public final class PacmanPanel extends JPanel {
       xPos = right + eyeballX - eyeSize / EYEBALL_MOVEMENT_FACTOR;
       g.fillOval(colPixel + xPos, rowPixel + yPos, eyeSize / HALF, eyeSize / HALF);
     }
+  }
+
+  /**
+   * Draws the current score at the top of the screen.
+   *
+   * @param g the graphics context to use for painting
+   */
+  private void drawScore(final Graphics g) {
+    g.setColor(Color.WHITE);
+    g.setFont(new Font("Arial", Font.BOLD, SCORE_FONT_SIZE));
+    String scoreText = "Score: " + game.getScore();
+    g.drawString(scoreText, SCORE_MARGIN, SCORE_FONT_SIZE + SCORE_MARGIN);
+  }
+
+  /**
+   * Draws the current number of lives at the top of the screen.
+   *
+   * @param g the graphics context to use for painting
+   */
+  private void drawLives(final Graphics g) {
+    g.setColor(Color.WHITE);
+    g.setFont(new Font("Arial", Font.BOLD, SCORE_FONT_SIZE));
+    String livesText = "Lives: " + game.getLives();
+    int textWidth = g.getFontMetrics().stringWidth(livesText);
+    int xPosition = game.getNumColumns() * CELL_SIZE - textWidth - SCORE_MARGIN;
+    g.drawString(livesText, xPosition, SCORE_FONT_SIZE + SCORE_MARGIN);
   }
 
   /** Listens for keyboard input to control Pacman's direction. */
