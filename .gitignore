@@ -1,0 +1,11 @@
+.direnv
+.vscode
+.idea
+.claude
+*.iml
+target
+CLAUDE.md
+bin
+.mvn
+ghost_movement.log
+reports

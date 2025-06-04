@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pmd xmlns="http://pmd.sourceforge.net/report/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://pmd.sourceforge.net/report/2.0.0 http://pmd.sourceforge.net/report_2_0_0.xsd" version="6.55.0" timestamp="2025-06-04T08:19:25.813">
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/api/PacmanGame.java">
+<violation beginline="27" endline="585" begincolumn="8" endcolumn="1" rule="GodClass" ruleset="Design" package="api" class="PacmanGame" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#godclass" priority="3">
+Possible God Class (WMC=78, ATFD=35, TCC=28.623%)
+</violation>
+<violation beginline="27" endline="585" begincolumn="25" endcolumn="1" rule="TooManyMethods" ruleset="Design" package="api" class="PacmanGame" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#toomanymethods" priority="3">
+This class has too many methods, consider refactoring it.
+</violation>
+<violation beginline="163" endline="242" begincolumn="10" endcolumn="3" rule="NcssCount" ruleset="Design" package="api" class="PacmanGame" method="PacmanGame" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The constructor 'PacmanGame(String, int)' has a NCSS line count of 71.
+</violation>
+<violation beginline="163" endline="242" begincolumn="10" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="api" class="PacmanGame" method="PacmanGame" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The constructor 'PacmanGame(String, int)' has a cognitive complexity of 23, current threshold is 15
+</violation>
+<violation beginline="241" endline="241" begincolumn="5" endcolumn="14" rule="ConstructorCallsOverridableMethod" ruleset="Error Prone" package="api" class="PacmanGame" method="PacmanGame" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#constructorcallsoverridablemethod" priority="1">
+Overridable method 'resetAll' called during object construction
+</violation>
+<violation beginline="486" endline="507" begincolumn="11" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="api" class="PacmanGame" method="checkCollisions" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'checkCollisions(Descriptor)' has a cognitive complexity of 15, current threshold is 15
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/com/pacman/ghost/ActorImpl.java">
+<violation beginline="23" endline="979" begincolumn="17" endcolumn="1" rule="GodClass" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#godclass" priority="3">
+Possible God Class (WMC=147, ATFD=80, TCC=19.088%)
+</violation>
+<violation beginline="23" endline="979" begincolumn="17" endcolumn="1" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The class 'ActorImpl' has a total cyclomatic complexity of 147 (highest 24).
+</violation>
+<violation beginline="23" endline="979" begincolumn="50" endcolumn="1" rule="TooManyMethods" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#toomanymethods" priority="3">
+This class has too many methods, consider refactoring it.
+</violation>
+<violation beginline="23" endline="979" begincolumn="17" endcolumn="1" rule="TooManyFields" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#toomanyfields" priority="3">
+Too many fields
+</violation>
+<violation beginline="114" endline="114" begincolumn="47" endcolumn="51" rule="UnusedAssignment" ruleset="Best Practices" package="com.pacman.ghost" class="ActorImpl" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_bestpractices.html#unusedassignment" priority="3">
+The field initializer for 'loggingInitialized' is never used (overwritten on lines 124 and 128)
+</violation>
+<violation beginline="172" endline="172" begincolumn="5" endcolumn="23" rule="ConstructorCallsOverridableMethod" ruleset="Error Prone" package="com.pacman.ghost" class="ActorImpl" method="ActorImpl" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#constructorcallsoverridablemethod" priority="1">
+Overridable method 'logMovement' called during object construction (call stack: [initializeLogging, logMovement])
+</violation>
+<violation beginline="213" endline="258" begincolumn="11" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="getNextLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'getNextLocation(Location, Direction)' has a cognitive complexity of 17, current threshold is 15
+</violation>
+<violation beginline="213" endline="258" begincolumn="11" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="getNextLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'getNextLocation(Location, Direction)' has a cyclomatic complexity of 17.
+</violation>
+<violation beginline="264" endline="353" begincolumn="11" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="calculateNextCellLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'calculateNextCellLocation()' has a cognitive complexity of 26, current threshold is 15
+</violation>
+<violation beginline="264" endline="353" begincolumn="11" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="calculateNextCellLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'calculateNextCellLocation()' has a cyclomatic complexity of 20.
+</violation>
+<violation beginline="264" endline="353" begincolumn="11" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="calculateNextCellLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'calculateNextCellLocation()' has an NPath complexity of 8640, current threshold is 200
+</violation>
+<violation beginline="417" endline="523" begincolumn="11" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="calculatePathToTarget" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="417" endline="523" begincolumn="11" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="calculatePathToTarget" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'calculatePathToTarget(Location, Location)' has a cognitive complexity of 33, current threshold is 15
+</violation>
+<violation beginline="417" endline="523" begincolumn="11" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="calculatePathToTarget" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'calculatePathToTarget(Location, Location)' has a cyclomatic complexity of 20.
+</violation>
+<violation beginline="417" endline="523" begincolumn="11" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="calculatePathToTarget" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'calculatePathToTarget(Location, Location)' has an NPath complexity of 7800, current threshold is 200
+</violation>
+<violation beginline="529" endline="611" begincolumn="11" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="handleFrightenedMode" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'handleFrightenedMode()' has a cognitive complexity of 23, current threshold is 15
+</violation>
+<violation beginline="642" endline="770" begincolumn="10" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="update" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="642" endline="770" begincolumn="10" endcolumn="3" rule="NcssCount" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="update" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'update(Descriptor)' has a NCSS line count of 78.
+</violation>
+<violation beginline="642" endline="770" begincolumn="10" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="update" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'update(Descriptor)' has a cognitive complexity of 29, current threshold is 15
+</violation>
+<violation beginline="642" endline="770" begincolumn="10" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="update" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'update(Descriptor)' has a cyclomatic complexity of 24.
+</violation>
+<violation beginline="642" endline="770" begincolumn="10" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="com.pacman.ghost" class="ActorImpl" method="update" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'update(Descriptor)' has an NPath complexity of 3600, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/com/pacman/ghost/Blinky.java">
+<violation beginline="46" endline="91" begincolumn="13" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="Blinky" method="getTargetLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'getTargetLocation(Descriptor)' has a cognitive complexity of 16, current threshold is 15
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/com/pacman/ghost/Clyde.java">
+<violation beginline="53" endline="110" begincolumn="13" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="Clyde" method="getTargetLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'getTargetLocation(Descriptor)' has a cognitive complexity of 19, current threshold is 15
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/com/pacman/ghost/Inky.java">
+<violation beginline="52" endline="127" begincolumn="13" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="Inky" method="getTargetLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'getTargetLocation(Descriptor)' has a cognitive complexity of 21, current threshold is 15
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/com/pacman/ghost/Pacman.java">
+<violation beginline="19" endline="413" begincolumn="14" endcolumn="1" rule="GodClass" ruleset="Design" package="com.pacman.ghost" class="Pacman" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#godclass" priority="3">
+Possible God Class (WMC=80, ATFD=14, TCC=10.458%)
+</violation>
+<violation beginline="19" endline="413" begincolumn="14" endcolumn="1" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="Pacman" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The class 'Pacman' has a total cyclomatic complexity of 80 (highest 30).
+</violation>
+<violation beginline="170" endline="265" begincolumn="10" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="Pacman" method="tryTurn" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'tryTurn(Direction)' has a cognitive complexity of 41, current threshold is 15
+</violation>
+<violation beginline="170" endline="265" begincolumn="10" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="Pacman" method="tryTurn" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'tryTurn(Direction)' has a cyclomatic complexity of 30.
+</violation>
+<violation beginline="170" endline="265" begincolumn="10" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="com.pacman.ghost" class="Pacman" method="tryTurn" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'tryTurn(Direction)' has an NPath complexity of 3234, current threshold is 200
+</violation>
+<violation beginline="268" endline="341" begincolumn="10" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="Pacman" method="update" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'update(Descriptor)' has a cognitive complexity of 23, current threshold is 15
+</violation>
+<violation beginline="268" endline="341" begincolumn="10" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="com.pacman.ghost" class="Pacman" method="update" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'update(Descriptor)' has a cyclomatic complexity of 21.
+</violation>
+<violation beginline="347" endline="389" begincolumn="11" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="Pacman" method="handleTurn" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'handleTurn()' has a cognitive complexity of 15, current threshold is 15
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/com/pacman/ghost/Pinky.java">
+<violation beginline="52" endline="121" begincolumn="13" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="com.pacman.ghost" class="Pinky" method="getTargetLocation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'getTargetLocation(Descriptor)' has a cognitive complexity of 21, current threshold is 15
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/ComprehensiveGhostTesting.java">
+<violation beginline="15" endline="424" begincolumn="14" endcolumn="1" rule="GodClass" ruleset="Design" package="ui" class="ComprehensiveGhostTesting" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#godclass" priority="3">
+Possible God Class (WMC=58, ATFD=79, TCC=6.667%)
+</violation>
+<violation beginline="140" endline="344" begincolumn="18" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="ComprehensiveGhostTesting" method="runStuckDetectionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="140" endline="344" begincolumn="18" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="ComprehensiveGhostTesting" method="runStuckDetectionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'runStuckDetectionTest(String, String, int)' has a NCSS line count of 96.
+</violation>
+<violation beginline="140" endline="344" begincolumn="18" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="ComprehensiveGhostTesting" method="runStuckDetectionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'runStuckDetectionTest(String, String, int)' has a cognitive complexity of 95, current threshold is 15
+</violation>
+<violation beginline="140" endline="344" begincolumn="18" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="ComprehensiveGhostTesting" method="runStuckDetectionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'runStuckDetectionTest(String, String, int)' has a cyclomatic complexity of 35.
+</violation>
+<violation beginline="140" endline="344" begincolumn="18" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="ComprehensiveGhostTesting" method="runStuckDetectionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'runStuckDetectionTest(String, String, int)' has an NPath complexity of 2632032, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostActivationTest.java">
+<violation beginline="11" endline="172" begincolumn="40" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostActivationTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostActivationTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="27" endline="111" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostActivationTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 24, current threshold is 15
+</violation>
+<violation beginline="27" endline="111" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostActivationTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 18.
+</violation>
+<violation beginline="27" endline="111" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostActivationTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 19968, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostBehaviorTest.java">
+<violation beginline="18" endline="389" begincolumn="14" endcolumn="1" rule="GodClass" ruleset="Design" package="ui" class="GhostBehaviorTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#godclass" priority="3">
+Possible God Class (WMC=54, ATFD=97, TCC=13.333%)
+</violation>
+<violation beginline="18" endline="389" begincolumn="38" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostBehaviorTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostBehaviorTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="59" endline="147" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostBehaviorTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 21, current threshold is 15
+</violation>
+<violation beginline="59" endline="147" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostBehaviorTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 20.
+</violation>
+<violation beginline="59" endline="147" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostBehaviorTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 73728, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostContinuousMovementTest.java">
+<violation beginline="9" endline="281" begincolumn="48" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostContinuousMovementTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostContinuousMovementTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="74" endline="280" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="GhostContinuousMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="74" endline="280" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="GhostContinuousMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 81.
+</violation>
+<violation beginline="74" endline="280" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostContinuousMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 70, current threshold is 15
+</violation>
+<violation beginline="74" endline="280" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostContinuousMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 34.
+</violation>
+<violation beginline="74" endline="280" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostContinuousMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 5916672, current threshold is 200
+</violation>
+<violation beginline="172" endline="189" begincolumn="15" endcolumn="15" rule="AvoidDeeplyNestedIfStmts" ruleset="Design" package="ui" class="GhostContinuousMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#avoiddeeplynestedifstmts" priority="3">
+Deeply nested if..then statements are hard to read
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostMovementBugTests.java">
+<violation beginline="12" endline="249" begincolumn="42" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostMovementBugTests" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostMovementBugTests' might be a test class, but it contains no test cases.
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostMovementFixValidation.java">
+<violation beginline="43" endline="178" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="GhostMovementFixValidation" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="43" endline="178" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="GhostMovementFixValidation" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 61.
+</violation>
+<violation beginline="43" endline="178" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostMovementFixValidation" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 40, current threshold is 15
+</violation>
+<violation beginline="43" endline="178" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostMovementFixValidation" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 32.
+</violation>
+<violation beginline="43" endline="178" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostMovementFixValidation" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 96000, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostMovementTest.java">
+<violation beginline="9" endline="228" begincolumn="38" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostMovementTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostMovementTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="68" endline="227" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="GhostMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="68" endline="227" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="GhostMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 70.
+</violation>
+<violation beginline="68" endline="227" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 51, current threshold is 15
+</violation>
+<violation beginline="68" endline="227" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 32.
+</violation>
+<violation beginline="68" endline="227" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostMovementTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 2830464, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostPositionTest.java">
+<violation beginline="8" endline="280" begincolumn="38" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostPositionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostPositionTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="73" endline="206" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="GhostPositionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="73" endline="206" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="GhostPositionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 68.
+</violation>
+<violation beginline="73" endline="206" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostPositionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 35, current threshold is 15
+</violation>
+<violation beginline="73" endline="206" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostPositionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 29.
+</violation>
+<violation beginline="73" endline="206" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostPositionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 11197440, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostSpawnTest.java">
+<violation beginline="8" endline="175" begincolumn="35" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostSpawnTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostSpawnTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="35" endline="174" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="GhostSpawnTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="35" endline="174" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="GhostSpawnTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 69.
+</violation>
+<violation beginline="35" endline="174" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostSpawnTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 65, current threshold is 15
+</violation>
+<violation beginline="35" endline="174" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostSpawnTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 37.
+</violation>
+<violation beginline="35" endline="174" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostSpawnTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 49353584, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostStuckAnalysis.java">
+<violation beginline="40" endline="249" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="GhostStuckAnalysis" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="40" endline="249" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="GhostStuckAnalysis" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 95.
+</violation>
+<violation beginline="40" endline="249" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostStuckAnalysis" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 69, current threshold is 15
+</violation>
+<violation beginline="40" endline="249" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostStuckAnalysis" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 41.
+</violation>
+<violation beginline="40" endline="249" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostStuckAnalysis" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 438707712, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostTargetingTest.java">
+<violation beginline="10" endline="366" begincolumn="14" endcolumn="1" rule="GodClass" ruleset="Design" package="ui" class="GhostTargetingTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#godclass" priority="3">
+Possible God Class (WMC=49, ATFD=64, TCC=0.000%)
+</violation>
+<violation beginline="10" endline="366" begincolumn="39" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostTargetingTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostTargetingTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="66" endline="144" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostTargetingTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 20, current threshold is 15
+</violation>
+<violation beginline="66" endline="144" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostTargetingTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 20.
+</violation>
+<violation beginline="66" endline="144" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostTargetingTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 21120, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/GhostWallCollisionTest.java">
+<violation beginline="10" endline="328" begincolumn="14" endcolumn="1" rule="GodClass" ruleset="Design" package="ui" class="GhostWallCollisionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#godclass" priority="3">
+Possible God Class (WMC=59, ATFD=59, TCC=16.667%)
+</violation>
+<violation beginline="10" endline="328" begincolumn="43" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="GhostWallCollisionTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'GhostWallCollisionTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="90" endline="245" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="GhostWallCollisionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="90" endline="245" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="GhostWallCollisionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 78.
+</violation>
+<violation beginline="90" endline="245" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="GhostWallCollisionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 66, current threshold is 15
+</violation>
+<violation beginline="90" endline="245" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostWallCollisionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 37.
+</violation>
+<violation beginline="90" endline="245" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="GhostWallCollisionTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 8097408, current threshold is 200
+</violation>
+<violation beginline="272" endline="307" begincolumn="18" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="GhostWallCollisionTest" method="isWallBetween" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'isWallBetween(PacmanGame, Location, Location)' has a cyclomatic complexity of 18.
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/Logger.java">
+<violation beginline="68" endline="68" begincolumn="5" endcolumn="22" rule="SystemPrintln" ruleset="Best Practices" package="ui" class="Logger" method="info" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_bestpractices.html#systemprintln" priority="2">
+System.out.println is used
+</violation>
+<violation beginline="78" endline="78" begincolumn="5" endcolumn="22" rule="SystemPrintln" ruleset="Best Practices" package="ui" class="Logger" method="error" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_bestpractices.html#systemprintln" priority="2">
+System.err.println is used
+</violation>
+<violation beginline="88" endline="88" begincolumn="5" endcolumn="22" rule="SystemPrintln" ruleset="Best Practices" package="ui" class="Logger" method="debug" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_bestpractices.html#systemprintln" priority="2">
+System.out.println is used
+</violation>
+<violation beginline="98" endline="98" begincolumn="5" endcolumn="22" rule="SystemPrintln" ruleset="Best Practices" package="ui" class="Logger" method="warn" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_bestpractices.html#systemprintln" priority="2">
+System.out.println is used
+</violation>
+<violation beginline="108" endline="108" begincolumn="5" endcolumn="20" rule="SystemPrintln" ruleset="Best Practices" package="ui" class="Logger" method="print" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_bestpractices.html#systemprintln" priority="2">
+System.out.print is used
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/MazeNavigationTest.java">
+<violation beginline="11" endline="216" begincolumn="39" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="MazeNavigationTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'MazeNavigationTest' might be a test class, but it contains no test cases.
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest.java">
+<violation beginline="32" endline="131" begincolumn="31" endcolumn="1" rule="TestClassWithoutTestCases" ruleset="Error Prone" package="ui" class="SimpleTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_errorprone.html#testclasswithouttestcases" priority="3">
+The class 'SimpleTest' might be a test class, but it contains no test cases.
+</violation>
+<violation beginline="54" endline="117" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="SimpleTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 18, current threshold is 15
+</violation>
+<violation beginline="54" endline="117" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="SimpleTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 16.
+</violation>
+<violation beginline="54" endline="117" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="SimpleTest" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 18432, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest1a.java">
+<violation beginline="35" endline="183" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="SimpleTest1a" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="35" endline="183" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="SimpleTest1a" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 85.
+</violation>
+<violation beginline="35" endline="183" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="SimpleTest1a" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 38, current threshold is 15
+</violation>
+<violation beginline="35" endline="183" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="SimpleTest1a" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 35.
+</violation>
+<violation beginline="35" endline="183" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="SimpleTest1a" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 2147483647, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTestFrightened.java">
+<violation beginline="34" endline="188" begincolumn="17" endcolumn="3" rule="ExcessiveMethodLength" ruleset="Design" package="ui" class="SimpleTestFrightened" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#excessivemethodlength" priority="3">
+Avoid really long methods.
+</violation>
+<violation beginline="34" endline="188" begincolumn="17" endcolumn="3" rule="NcssCount" ruleset="Design" package="ui" class="SimpleTestFrightened" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#ncsscount" priority="3">
+The method 'main(String)' has a NCSS line count of 96.
+</violation>
+<violation beginline="34" endline="188" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="SimpleTestFrightened" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'main(String)' has a cognitive complexity of 36, current threshold is 15
+</violation>
+<violation beginline="34" endline="188" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="SimpleTestFrightened" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'main(String)' has a cyclomatic complexity of 36.
+</violation>
+<violation beginline="34" endline="188" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="SimpleTestFrightened" method="main" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'main(String)' has an NPath complexity of 2147483647, current threshold is 200
+</violation>
+</file>
+<file name="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimulationTestFramework.java">
+<violation beginline="129" endline="146" begincolumn="17" endcolumn="3" rule="DataClass" ruleset="Design" package="ui" class="SimulationTestFramework$SimulationConfig" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#dataclass" priority="3">
+The class 'SimulationConfig' is suspected to be a Data Class (WOC=0.000%, NOPA=4, NOAM=0, WMC=3)
+</violation>
+<violation beginline="149" endline="197" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="SimulationTestFramework" method="runSimulation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'runSimulation(String, SimulationConfig)' has a cognitive complexity of 16, current threshold is 15
+</violation>
+<violation beginline="149" endline="197" begincolumn="17" endcolumn="3" rule="CyclomaticComplexity" ruleset="Design" package="ui" class="SimulationTestFramework" method="runSimulation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cyclomaticcomplexity" priority="3">
+The method 'runSimulation(String, SimulationConfig)' has a cyclomatic complexity of 15.
+</violation>
+<violation beginline="149" endline="197" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="SimulationTestFramework" method="runSimulation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'runSimulation(String, SimulationConfig)' has an NPath complexity of 378, current threshold is 200
+</violation>
+<violation beginline="158" endline="160" begincolumn="5" endcolumn="5" rule="ForLoopCanBeForeach" ruleset="Best Practices" package="ui" class="SimulationTestFramework" method="runSimulation" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_bestpractices.html#forloopcanbeforeach" priority="3">
+This for loop can be replaced by a foreach loop
+</violation>
+<violation beginline="434" endline="497" begincolumn="17" endcolumn="3" rule="CognitiveComplexity" ruleset="Design" package="ui" class="SimulationTestFramework" method="runComprehensiveTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#cognitivecomplexity" priority="3">
+The method 'runComprehensiveTest(String, SimulationConfig)' has a cognitive complexity of 22, current threshold is 15
+</violation>
+<violation beginline="434" endline="497" begincolumn="17" endcolumn="3" rule="NPathComplexity" ruleset="Design" package="ui" class="SimulationTestFramework" method="runComprehensiveTest" externalInfoUrl="https://pmd.github.io/pmd-6.55.0/pmd_rules_java_design.html#npathcomplexity" priority="3">
+The method 'runComprehensiveTest(String, SimulationConfig)' has an NPath complexity of 342, current threshold is 200
+</violation>
+</file>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+<suppressedviolation filename="/home/connerohnesorge/Documents/001Repos/pac-man-java/src/ui/SimpleTest3.java" suppressiontype="annotation" msg="Logger calls should be surrounded by log level guards." usermsg=""></suppressedviolation>
+</pmd>
