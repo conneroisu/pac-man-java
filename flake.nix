@@ -190,7 +190,6 @@
               jdt-language-server
               maven
               checkstyle
-              jetbrains.idea-community-src
             ]
             ++ (with pkgs;
               lib.optionals stdenv.isDarwin [
